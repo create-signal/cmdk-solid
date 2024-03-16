@@ -6,7 +6,7 @@
     "build": "vinxi build",
     "start": "vinxi start",
     "test": "playwright test",
-    "playwright-install": "playwright install"
+    "playwright-install": "playwright install --with-deps"
   },
   "dependencies": {
     "@kobalte/core": "^0.12.4",
