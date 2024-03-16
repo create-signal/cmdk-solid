@@ -10,7 +10,7 @@
 
 Every attempt was made to make the behavior identical. The most notable difference is the inclusion of [Kobalte](https://kobalte.dev/docs/core/components/dialog) to provide Dialog boxes which has a slightly different API to RadixUI.
 
-Demo and examples: Coming Next
+Demo and examples: [https://cmdk-solid.vercel.app/](https://cmdk-solid.vercel.app/)
 
 ## Install
 
