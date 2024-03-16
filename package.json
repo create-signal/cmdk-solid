@@ -47,13 +47,13 @@
     "format": "prettier '**/*.{js,jsx,ts,tsx,json,md,mdx,css,scss,yaml,yml}' --write",
     "preinstall": "npx only-allow pnpm",
     "test:format": "prettier '**/*.{js,jsx,ts,tsx,json,md,mdx,css,scss,yaml,yml}' --check",
-    "test": "pnpm -F test test",
-    "playwright-install": "pnpm -F test playwright-install"
+    "test": "playwright test"
   },
   "peerDependencies": {
     "solid-js": "^1.8"
   },
   "devDependencies": {
+    "@playwright/test": "^1.39.0",
     "@typescript-eslint/eslint-plugin": "^6.1.0",
     "@typescript-eslint/parser": "^6.1.0",
     "concurrently": "^8.2.0",

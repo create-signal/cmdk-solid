@@ -1,6 +1,19 @@
-node_modules
-dist
-gitignore
+.DS_Store
+.idea
+.env
+.env.local
+.env.development
+.env.development.local
+*.log
+
+.vercel/
+.turbo/
+.next/
+.yalc/
+build/
+dist/
+node_modules/
+.vercel
 
 # tsup
 tsup.config.bundled_*.{m,c,}s

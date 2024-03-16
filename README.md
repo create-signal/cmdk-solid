@@ -467,7 +467,7 @@ First, install dependencies and Playwright browsers:
 
 ```bash
 pnpm install
-pnpm playwright-install
+pnpm playwright install
 ```
 
 Then ensure you've built the library:
