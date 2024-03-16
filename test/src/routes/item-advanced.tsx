@@ -6,7 +6,7 @@ const Page = () => {
 
   return (
     <div>
-      <button data-testid="increment" onClick={() => setCount(c => c + 1)}>
+      <button data-testid="increment" onClick={() => setCount((c) => c + 1)}>
         Increment count
       </button>
 

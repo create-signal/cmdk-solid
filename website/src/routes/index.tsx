@@ -13,16 +13,7 @@ import {
   VercelIcon,
 } from '../components'
 import { Motion, MotionComponentProps } from 'solid-motionone'
-import {
-  Accessor,
-  JSX,
-  createContext,
-  createEffect,
-  createSignal,
-  onCleanup,
-  onMount,
-  useContext,
-} from 'solid-js'
+import { Accessor, JSX, createContext, createEffect, createSignal, onCleanup, onMount, useContext } from 'solid-js'
 import packageJSON from '../../../cmdk/package.json'
 import styles from '../styles/index.module.scss'
 import { For, Show } from 'solid-js/web'
@@ -180,7 +171,7 @@ function ThemeSwitcher() {
 
   onMount(() => {
     function listener(e: KeyboardEvent) {
-      const themeNames = themes.map(t => t.key)
+      const themeNames = themes.map((t) => t.key)
 
       if (e.key === 'ArrowRight') {
         const currentIndex = themeNames.indexOf(theme())

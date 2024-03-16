@@ -118,8 +118,7 @@ function commandScoreInner(
     if (
       (score < SCORE_TRANSPOSITION &&
         lowerString.charAt(index - 1) === lowerAbbreviation.charAt(abbreviationIndex + 1)) ||
-      (lowerAbbreviation.charAt(abbreviationIndex + 1) ===
-        lowerAbbreviation.charAt(abbreviationIndex) && // allow duplicate letters. Ref #7428
+      (lowerAbbreviation.charAt(abbreviationIndex + 1) === lowerAbbreviation.charAt(abbreviationIndex) && // allow duplicate letters. Ref #7428
         lowerString.charAt(index - 1) !== lowerAbbreviation.charAt(abbreviationIndex))
     ) {
       transposedScore = commandScoreInner(
@@ -159,13 +158,5 @@ export function commandScore(string: string, abbreviation: string, aliases?: str
    * was the dominating cost in the algorithm, passing both is a little ugly, but considerably faster.
    */
   string = aliases && aliases.length > 0 ? `${string + ' ' + aliases.join(' ')}` : string
-  return commandScoreInner(
-    string,
-    abbreviation,
-    formatInput(string),
-    formatInput(abbreviation),
-    0,
-    0,
-    {},
-  )
+  return commandScoreInner(string, abbreviation, formatInput(string), formatInput(abbreviation), 0, 0, {})
 }

@@ -23,7 +23,7 @@ test.describe('basic behavior', async () => {
   test('item onSelect is called on click', async ({ page }) => {
     const item = page.locator(`[cmdk-item][data-value="Item"]`)
     const [message] = await Promise.all([
-      page.waitForEvent('console', message => message.text() == 'Item selected'),
+      page.waitForEvent('console', (message) => message.text() == 'Item selected'),
       item.click(),
     ])
     expect(message.text()).toEqual('Item selected')

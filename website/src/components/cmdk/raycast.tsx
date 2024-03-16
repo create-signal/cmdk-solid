@@ -111,18 +111,14 @@ function Item({
   )
 }
 
-function SubCommand(props: {
-  inputRef: HTMLInputElement | null
-  listRef: HTMLElement | null
-  selectedValue: string
-}) {
+function SubCommand(props: { inputRef: HTMLInputElement | null; listRef: HTMLElement | null; selectedValue: string }) {
   const [open, setOpen] = createSignal(false)
 
   onMount(() => {
     function listener(e: KeyboardEvent) {
       if (e.key === 'k' && e.metaKey) {
         e.preventDefault()
-        setOpen(o => !o)
+        setOpen((o) => !o)
       }
     }
 
@@ -157,7 +153,7 @@ function SubCommand(props: {
       <Popover.Portal>
         <Popover.Content
           class="raycast-submenu"
-          onCloseAutoFocus={e => {
+          onCloseAutoFocus={(e) => {
             //? Note: This doesn't appear to work
             e.preventDefault()
             props.inputRef?.focus()
@@ -197,7 +193,7 @@ function SubItem(props: { children: JSX.Element; shortcut: string }) {
     <Command.Item>
       {props.children}
       <div cmdk-raycast-submenu-shortcuts="">
-        <For each={props.shortcut.split(' ')}>{key => <kbd>{key}</kbd>}</For>
+        <For each={props.shortcut.split(' ')}>{(key) => <kbd>{key}</kbd>}</For>
       </div>
     </Command.Item>
   )
@@ -205,13 +201,7 @@ function SubItem(props: { children: JSX.Element; shortcut: string }) {
 
 function RaycastDarkIcon() {
   return (
-    <svg
-      width="1024"
-      height="1024"
-      viewBox="0 0 1024 1024"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-    >
+    <svg width="1024" height="1024" viewBox="0 0 1024 1024" fill="none" xmlns="http://www.w3.org/2000/svg">
       <path
         fill-rule="evenodd"
         clip-rule="evenodd"
@@ -267,13 +257,7 @@ function StarIcon() {
 function ClipboardIcon() {
   return (
     <div cmdk-raycast-clipboard-icon="">
-      <svg
-        width="32"
-        height="32"
-        viewBox="0 0 16 16"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-      >
+      <svg width="32" height="32" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path
           d="M6.07512 2.75H4.75C3.64543 2.75 2.75 3.64543 2.75 4.75V12.25C2.75 13.3546 3.64543 14.25 4.75 14.25H11.25C12.3546 14.25 13.25 13.3546 13.25 12.25V4.75C13.25 3.64543 12.3546 2.75 11.25 2.75H9.92488M9.88579 3.02472L9.5934 4.04809C9.39014 4.75952 8.73989 5.25 8 5.25V5.25C7.26011 5.25 6.60986 4.75952 6.4066 4.04809L6.11421 3.02472C5.93169 2.38591 6.41135 1.75 7.07573 1.75H8.92427C9.58865 1.75 10.0683 2.3859 9.88579 3.02472Z"
           stroke="currentColor"
@@ -289,13 +273,7 @@ function ClipboardIcon() {
 function HammerIcon() {
   return (
     <div cmdk-raycast-hammer-icon="">
-      <svg
-        width="32"
-        height="32"
-        viewBox="0 0 16 16"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-      >
+      <svg width="32" height="32" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path
           d="M6.73762 6.19288L2.0488 11.2217C1.6504 11.649 1.6504 12.3418 2.0488 12.769L3.13083 13.9295C3.52923 14.3568 4.17515 14.3568 4.57355 13.9295L9.26238 8.90071M6.73762 6.19288L7.0983 5.80605C7.4967 5.37877 7.4967 4.686 7.0983 4.25872L6.01627 3.09822L6.37694 2.71139C7.57213 1.42954 9.50991 1.42954 10.7051 2.71139L13.9512 6.19288C14.3496 6.62017 14.3496 7.31293 13.9512 7.74021L12.8692 8.90071C12.4708 9.328 11.8248 9.328 11.4265 8.90071L11.0658 8.51388C10.6674 8.0866 10.0215 8.0866 9.62306 8.51388L9.26238 8.90071M6.73762 6.19288L9.26238 8.90071"
           stroke="currentColor"

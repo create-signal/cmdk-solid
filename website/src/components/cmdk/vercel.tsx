@@ -10,7 +10,7 @@ export function VercelCMDK() {
   const isHome = () => activePage() === 'home'
 
   const popPage = () => {
-    setPages(pages => {
+    setPages((pages) => {
       const x = [...pages]
       x.splice(-1, 1)
       return x
@@ -33,7 +33,7 @@ export function VercelCMDK() {
   return (
     <div class="vercel">
       <Command
-        ref={el => (ref = el)}
+        ref={(el) => (ref = el)}
         onKeyDown={(e: KeyboardEvent) => {
           if (e.key === 'Enter') {
             bounce()
@@ -51,20 +51,18 @@ export function VercelCMDK() {
         }}
       >
         <div>
-          <For each={pages()}>{page => <div cmdk-vercel-badge="">{page}</div>}</For>
+          <For each={pages()}>{(page) => <div cmdk-vercel-badge="">{page}</div>}</For>
         </div>
         <Command.Input
           autofocus
           placeholder="What do you need?"
-          onValueChange={value => {
+          onValueChange={(value) => {
             setInputValue(value)
           }}
         />
         <Command.List>
           <Command.Empty>No results found.</Command.Empty>
-          {activePage() === 'home' && (
-            <Home searchProjects={() => setPages([...pages(), 'projects'])} />
-          )}
+          {activePage() === 'home' && <Home searchProjects={() => setPages([...pages(), 'projects'])} />}
           {activePage() === 'projects' && <Projects />}
         </Command.List>
       </Command>
@@ -131,17 +129,13 @@ function Projects() {
   )
 }
 
-function Item(props: {
-  children: JSX.Element
-  shortcut?: string
-  onSelect?: (value: string) => void
-}) {
+function Item(props: { children: JSX.Element; shortcut?: string; onSelect?: (value: string) => void }) {
   return (
     <Command.Item onSelect={props.onSelect}>
       {props.children}
       <Show when={props.shortcut}>
         <div cmdk-vercel-shortcuts="">
-          <For each={props.shortcut!.split(' ')}>{key => <kbd>{key}</kbd>}</For>
+          <For each={props.shortcut!.split(' ')}>{(key) => <kbd>{key}</kbd>}</For>
         </div>
       </Show>
     </Command.Item>

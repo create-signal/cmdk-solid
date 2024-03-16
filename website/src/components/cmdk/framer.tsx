@@ -107,15 +107,7 @@ function Container() {
   return <div cmdk-framer-container="" />
 }
 
-function Item({
-  children,
-  value,
-  subtitle,
-}: {
-  children: JSX.Element
-  value: string
-  subtitle: string
-}) {
+function Item({ children, value, subtitle }: { children: JSX.Element; value: string; subtitle: string }) {
   return (
     <Command.Item value={value} onSelect={() => {}}>
       <div cmdk-framer-icon-wrapper="">{children}</div>
@@ -228,11 +220,7 @@ function SearchIcon() {
       stroke="currentColor"
       stroke-width={1.5}
     >
-      <path
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-      />
+      <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
     </svg>
   )
 }

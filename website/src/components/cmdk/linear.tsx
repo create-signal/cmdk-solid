@@ -15,7 +15,7 @@ export function LinearCMDK() {
                 {icon()}
                 {label}
                 <div cmdk-linear-shortcuts="">
-                  <For each={shortcut}>{key => <kbd>{key}</kbd>}</For>
+                  <For each={shortcut}>{(key) => <kbd>{key}</kbd>}</For>
                 </div>
               </Command.Item>
             )}

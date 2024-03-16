@@ -38,25 +38,24 @@ const theme = {
 
 export function Code(props: { children: string }) {
   return (
-   
-        <pre class={styles.root}>
-          <button
-            aria-label="Copy Code"
-            onClick={() => {
-              copy(props.children)
-            }}
-          >
-            <CopyIcon />
-          </button>
-          <div class={styles.shine} />
-          <div >{props.children}</div>
-          {/*tokens.map((line, i) => (
+    <pre class={styles.root}>
+      <button
+        aria-label="Copy Code"
+        onClick={() => {
+          copy(props.children)
+        }}
+      >
+        <CopyIcon />
+      </button>
+      <div class={styles.shine} />
+      <div>{props.children}</div>
+      {/*tokens.map((line, i) => (
             <div key={i} {...getLineProps({ line, key: i })}>
               {line.map((token, key) => (
                 <span key={i} {...getTokenProps({ token, key })} />
               ))}
             </div>
               ))*/}
-        </pre>
+    </pre>
   )
 }

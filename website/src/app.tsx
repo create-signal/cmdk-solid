@@ -16,7 +16,7 @@ const siteUrl = 'https://cmdk.paco.me'
 export default function App() {
   return (
     <Router
-      root={props => (
+      root={(props) => (
         <MetaProvider>
           <Title>
             {description} - {title}

@@ -14,18 +14,13 @@ const Page = () => {
         <button data-testid="controlledSearch" onClick={() => setSearch('eat')}>
           Change search value
         </button>
-        <button data-testid="openClosePopover" onClick={() => setOpen(val => !val)}>
+        <button data-testid="openClosePopover" onClick={() => setOpen((val) => !val)}>
           <Show when={open()} fallback={'Open'}>
             Close
           </Show>
         </button>
         <Command class="root">
-          <Command.Input
-            value={search()}
-            onValueChange={setSearch}
-            placeholder="Search…"
-            class="input"
-          />
+          <Command.Input value={search()} onValueChange={setSearch} placeholder="Search…" class="input" />
 
           <Portal data-portal="true">
             <Show when={open()}>

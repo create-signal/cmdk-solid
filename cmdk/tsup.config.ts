@@ -24,7 +24,7 @@ const CI =
   process.env['CI'] === '"1"' ||
   process.env['GITHUB_ACTIONS'] === '"1"'
 
-export default defineConfig(config => {
+export default defineConfig((config) => {
   const watching = !!config.watch
 
   const parsed_options = preset.parsePresetOptions(preset_options, watching)

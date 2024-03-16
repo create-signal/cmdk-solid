@@ -11,7 +11,7 @@ const CommandMenu = () => {
     const down = (e: KeyboardEvent) => {
       if (e.key === 'k' && (e.metaKey || e.ctrlKey)) {
         e.preventDefault()
-        setOpen(open => !open)
+        setOpen((open) => !open)
       }
     }
 
@@ -50,7 +50,7 @@ const CommandMenu = () => {
 }
 
 const CustomEmpty = () => {
-  const search = useCommandState(state => state.search)
+  const search = useCommandState((state) => state.search)
 
   createEffect(() => {
     console.log('Searched for', search())
@@ -66,21 +66,19 @@ const CommandMenuWithPages = () => {
 
   return (
     <Command
-      onKeyDown={e => {
+      onKeyDown={(e) => {
         // Escape goes to previous page
         // Backspace goes to previous page when search is empty
         if (e.key === 'Escape' || (e.key === 'Backspace' && !search())) {
           e.preventDefault()
-          setPages(pages => pages.slice(0, -1))
+          setPages((pages) => pages.slice(0, -1))
         }
       }}
     >
       <Command.Input value={search()} onValueChange={setSearch} />
       <Command.List>
         <Show when={!page()}>
-          <Command.Item onSelect={() => setPages([...pages(), 'projects'])}>
-            Search projects…
-          </Command.Item>
+          <Command.Item onSelect={() => setPages([...pages(), 'projects'])}>Search projects…</Command.Item>
           <Command.Item onSelect={() => setPages([...pages(), 'teams'])}>Join a team…</Command.Item>
         </Show>
 
@@ -100,7 +98,7 @@ const CommandMenuWithPages = () => {
 
 const SubItemsSearch = () => {
   const SubItem = (props: CommandItemProps) => {
-    const search = useCommandState(state => state.search)
+    const search = useCommandState((state) => state.search)
     return (
       <Show when={!search()}>
         <Command.Item {...props} />
@@ -121,7 +119,7 @@ const SubItemsSearch = () => {
 }
 
 const asyncResource = async () => {
-  await new Promise(r => setTimeout(r, 5000))
+  await new Promise((r) => setTimeout(r, 5000))
   return ['apple', 'banana', 'cherry']
 }
 
@@ -148,7 +146,7 @@ const AsyncCommandMenu = () => {
           <Command.Loading>Fetching words…</Command.Loading>
         </Show>
         <For each={items()}>
-          {item => {
+          {(item) => {
             return <Command.Item value={item}>{item}</Command.Item>
           }}
         </For>
