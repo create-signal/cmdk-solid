@@ -1,0 +1,23 @@
+{
+  "name": "test",
+  "type": "module",
+  "scripts": {
+    "dev": "vinxi dev",
+    "build": "vinxi build",
+    "start": "vinxi start",
+    "test": "playwright test",
+    "playwright-install": "playwright install"
+  },
+  "dependencies": {
+    "@kobalte/core": "^0.12.4",
+    "@playwright/test": "^1.39.0",
+    "@solidjs/router": "^0.13.0",
+    "@solidjs/start": "^0.7.4",
+    "cmdk": "workspace:*",
+    "solid-js": "^1.8.15",
+    "vinxi": "^0.3.10"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

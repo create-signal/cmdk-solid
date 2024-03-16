@@ -1,0 +1,83 @@
+{
+  "name": "cmdk-solid-root",
+  "version": "1.0.0",
+  "description": "Fast, Unstyled, Command Menu for SolidJS",
+  "license": "MIT",
+  "contributors": [],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/create-signal/cmdk-solid.git"
+  },
+  "homepage": "https://github.com/create-signal/cmdk-solid#readme",
+  "bugs": {
+    "url": "https://github.com/create-signal/cmdk-solid/issues"
+  },
+  "files": [
+    "dist"
+  ],
+  "private": false,
+  "sideEffects": false,
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "browser": {},
+  "exports": {
+    "solid": {
+      "development": "./dist/dev.jsx",
+      "import": "./dist/index.jsx"
+    },
+    "development": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/dev.js"
+      }
+    },
+    "import": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "typesVersions": {},
+  "scripts": {
+    "build": "pnpm -F cmdk build",
+    "dev": "pnpm -F cmdk build --watch",
+    "website": "pnpm -F website dev",
+    "testsite": "pnpm -F test dev",
+    "format": "prettier '**/*.{js,jsx,ts,tsx,json,md,mdx,css,scss,yaml,yml}' --write",
+    "preinstall": "npx only-allow pnpm",
+    "test:format": "prettier '**/*.{js,jsx,ts,tsx,json,md,mdx,css,scss,yaml,yml}' --check",
+    "test": "pnpm -F test test",
+    "playwright-install": "pnpm -F test playwright-install"
+  },
+  "peerDependencies": {
+    "solid-js": "^1.8"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^6.1.0",
+    "@typescript-eslint/parser": "^6.1.0",
+    "concurrently": "^8.2.0",
+    "esbuild": "^0.18.15",
+    "esbuild-plugin-solid": "^0.5.0",
+    "eslint": "^8.45.0",
+    "eslint-plugin-eslint-comments": "^3.2.0",
+    "eslint-plugin-no-only-tests": "^3.1.0",
+    "jsdom": "^22.1.0",
+    "prettier": "3.0.0",
+    "solid-js": "^1.8",
+    "tsup": "^8.0.0",
+    "tsup-preset-solid": "^2.0.1",
+    "typescript": "^5.1.6",
+    "vite": "^4.4.6",
+    "vite-plugin-solid": "^2.7.0",
+    "vitest": "^0.33.0"
+  },
+  "keywords": [
+    "solid"
+  ],
+  "packageManager": "pnpm@8.6.0",
+  "engines": {
+    "node": ">=18",
+    "pnpm": ">=8.6.0"
+  }
+}
