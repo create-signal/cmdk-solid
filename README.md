@@ -21,7 +21,7 @@ pnpm install cmdk-solid
 ## Use
 
 ```tsx
-import { Command } from 'cmdk-solid-solid'
+import { Command } from 'cmdk-solid'
 
 const CommandMenu = () => {
   return (
@@ -445,7 +445,7 @@ You can find global stylesheets to drop in as a starting point for styling. See 
 
 **Unstyled?** Yes, use the listed CSS selectors.
 
-**Hydration mismatch?** This may be a bug in your code. Feel free to create an issue in this repo if you are sure it isn't
+**Hydration mismatch?** This may be a bug in your code. Feel free to create an issue in this repo if you are sure it is not.
 
 **Weird/wrong behavior?** Make sure your `Command.Item` has a unique `value`.
 
