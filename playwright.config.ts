@@ -4,16 +4,16 @@ const config: PlaywrightTestConfig = {
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
   reporter: process.env.CI ? [['github'], ['json', { outputFile: 'playwright-report.json' }]] : 'list',
-  timeout: 30000,
   testDir: './test/tests',
-  expect: {
-    timeout: 10000,
-  },
-  ...(!process.env.CI && { workers: 1 }),
   use: {
     trace: 'on-first-retry',
     baseURL: 'http://localhost:3000',
   },
+  timeout: 30000,
+  expect: {
+    timeout: 10000,
+  },
+  ...(!process.env.CI && { workers: 1 }),
   webServer: {
     command: 'npm run dev',
     port: 3000,

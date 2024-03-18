@@ -79,7 +79,7 @@ export type CommandGroupProps = Children &
     /** Whether this group is forcibly rendered regardless of filtering. */
     forceMount?: boolean
   }
-type InputProps = Omit<JSX.IntrinsicElements['input'], 'value' | 'onChange' | 'type'> & {
+export type CommandInputProps = Omit<JSX.IntrinsicElements['input'], 'value' | 'onChange' | 'type'> & {
   /**
    * Optional controlled state for the value of the search input.
    */
@@ -260,7 +260,7 @@ const Command: Component<CommandRootProps> = (props) => {
       setState(key, value)
 
       if (key === 'search') {
-        //sort()
+        sort()
         //schedule(1, selectFirstItem)
         schedule(8, selectFirstItem)
       } else if (key === 'value') {
@@ -286,6 +286,7 @@ const Command: Component<CommandRootProps> = (props) => {
         [id]: { value, keywords },
       }))
 
+      //! Causes a re-render loop, I should investigate further
       //sort()
     },
     // Track item lifecycle (mount, unmount)
@@ -303,9 +304,10 @@ const Command: Component<CommandRootProps> = (props) => {
         }
       })
 
-      //sort()
       // Could be initial mount, select the first item if none already selected
       schedule(3, () => {
+        //sort()
+
         if (!state.value) {
           selectFirstItem()
         }
@@ -364,7 +366,7 @@ const Command: Component<CommandRootProps> = (props) => {
   }
 
   /** Sorts items by score, and groups by highest item score. */
-  /*function sort() {
+  function sort() {
     if (
       !state.search ||
       // Explicitly false, because true | undefined is the default
@@ -377,13 +379,13 @@ const Command: Component<CommandRootProps> = (props) => {
 
     // Sort the groups
     const groups: [string, number][] = []
-    state.filtered.groups.forEach(value => {
-      const items = allGroups.get(value)
+    state.filtered.groups.forEach((value) => {
+      const items = state.groups[value] || []
 
       // Get the maximum score of the group's items
       let max = 0
-      ;(items || []).forEach(item => {
-        const score = scores.get(item) || 0
+      items.forEach((item) => {
+        const score = scores[item] || 0
         max = Math.max(score, max)
       })
 
@@ -400,33 +402,33 @@ const Command: Component<CommandRootProps> = (props) => {
       .sort((a, b) => {
         const valueA = a.getAttribute('id')!
         const valueB = b.getAttribute('id')!
-        return (scores.get(valueB) ?? 0) - (scores.get(valueA) ?? 0)
+        return (scores[valueB] ?? 0) - (scores[valueA] ?? 0)
       })
-      .forEach(item => {
+      .forEach((item) => {
         const group = item.closest(GROUP_ITEMS_SELECTOR)
 
         if (group) {
-          group.appendChild(
-            item.parentElement === group ? item : item.closest(`${GROUP_ITEMS_SELECTOR} > *`)!,
-          )
+          group.appendChild(item.parentElement === group ? item : item.closest(`${GROUP_ITEMS_SELECTOR} > *`)!)
         } else {
           listInsertionElement.appendChild(
-            item.parentElement === listInsertionElement
-              ? item
-              : item.closest(`${GROUP_ITEMS_SELECTOR} > *`)!,
+            item.parentElement === listInsertionElement ? item : item.closest(`${GROUP_ITEMS_SELECTOR} > *`)!,
           )
         }
       })
 
     groups
       .sort((a, b) => b[1] - a[1])
-      .forEach(group => {
+      .forEach((group) => {
+        //! There is a bug here, groups should be found by id attribute instead of value
+        //! I've left it as the bug exists in the original library
+        //? To Fix it
+        //? const element = listInnerRef()!.querySelector(`${GROUP_SELECTOR}[id="${group[0]}"]`)
         const element = listInnerRef()!.querySelector(
           `${GROUP_SELECTOR}[${VALUE_ATTR}="${encodeURIComponent(group[0])}"]`,
         )
         element?.parentElement?.appendChild(element)
       })
-  }*/
+  }
 
   function selectFirstItem() {
     const item = getValidItems().find((item) => item.getAttribute('aria-disabled') !== 'true')
@@ -761,6 +763,7 @@ const Group: ParentComponent<CommandGroupProps> = (props) => {
       ref={mergeRefs((el) => setRef(el), props.ref)}
       {...etc}
       cmdk-group=""
+      id={id}
       role="presentation"
       hidden={render() ? undefined : true}
     >
@@ -797,7 +800,7 @@ const Separator: Component<CommandSeparatorProps> = (props) => {
  * Command menu input.
  * All props are forwarded to the underyling `input` element.
  */
-const Input: Component<InputProps> = (props) => {
+const Input: Component<CommandInputProps> = (props) => {
   const [localProps, etc] = splitProps(props, ['onValueChange', 'ref'])
   const isControlled = () => props.value != null
   const store = useStore()
