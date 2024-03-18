@@ -9,8 +9,10 @@ import {
   LinearIcon,
   RaycastCMDK,
   RaycastIcon,
+  ShadcnIcon,
   VercelCMDK,
   VercelIcon,
+  ShadcnCMDK,
 } from '../components'
 import { Motion, MotionComponentProps } from 'solid-motionone'
 import { Accessor, JSX, createContext, createEffect, createSignal, onCleanup, onMount, useContext } from 'solid-js'
@@ -24,7 +26,7 @@ type TTheme = {
   setTheme: Function
 }
 
-type Themes = 'linear' | 'raycast' | 'vercel' | 'framer'
+type Themes = 'linear' | 'raycast' | 'vercel' | 'framer' | 'shadcn/ui'
 
 const ThemeContext = createContext<TTheme>({} as TTheme)
 
@@ -71,6 +73,11 @@ export default function Index() {
         <Show when={theme() === 'vercel'}>
           <CMDKWrapper>
             <VercelCMDK />
+          </CMDKWrapper>
+        </Show>
+        <Show when={theme() === 'shadcn/ui'}>
+          <CMDKWrapper>
+            <ShadcnCMDK />
           </CMDKWrapper>
         </Show>
 
@@ -162,6 +169,10 @@ const themes = [
   {
     icon: FramerIcon,
     key: 'framer',
+  },
+  {
+    icon: ShadcnIcon,
+    key: 'shadcn/ui',
   },
 ]
 

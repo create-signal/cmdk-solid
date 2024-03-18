@@ -85,9 +85,9 @@ export function VercelIcon() {
   )
 }
 
-export function LinearIcon({ style }: { style?: JSX.CSSProperties }) {
+export function LinearIcon(props: { style?: string }) {
   return (
-    <svg width="64" height="64" viewBox="0 0 64 64" fill="none" style={style}>
+    <svg width="64" height="64" viewBox="0 0 64 64" fill="none" style={props.style}>
       <path
         d="M0.403013 37.3991L26.6009 63.597C13.2225 61.3356 2.66442 50.7775 0.403013 37.3991Z"
         fill="#5E6AD2"
@@ -108,6 +108,35 @@ export function LinearIcon({ style }: { style?: JSX.CSSProperties }) {
   )
 }
 
+export function ShadcnIcon(props: { style?: string }) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" style={props.style}>
+      <rect width="256" height="256" fill="none"></rect>
+      <line
+        x1="208"
+        y1="128"
+        x2="128"
+        y2="208"
+        fill="none"
+        stroke="currentColor"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        stroke-width="16"
+      ></line>
+      <line
+        x1="192"
+        y1="40"
+        x2="40"
+        y2="192"
+        fill="none"
+        stroke="currentColor"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        stroke-width="16"
+      ></line>
+    </svg>
+  )
+}
 export function Logo({ children, size = '20px' }: { children: JSX.Element; size?: string }) {
   return (
     <div
