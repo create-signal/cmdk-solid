@@ -26,7 +26,7 @@ type TTheme = {
   setTheme: Function
 }
 
-type Themes = 'linear' | 'raycast' | 'vercel' | 'framer' | 'shadcn/ui'
+type Themes = 'linear' | 'raycast' | 'vercel' | 'framer' | 'shadcn'
 
 const ThemeContext = createContext<TTheme>({} as TTheme)
 
@@ -39,7 +39,7 @@ export default function Index() {
         <div class={styles.meta}>
           <div class={styles.info}>
             <VersionBadge />
-            <h1>⌘K</h1>
+            <h1>⌘K for SolidJS</h1>
             <p>
               Fast, composable, unstyled command menu for SolidJS, Ported from{' '}
               <a href="https://github.com/pacocoursey/cmdk" target="_blank">
@@ -75,7 +75,7 @@ export default function Index() {
             <VercelCMDK />
           </CMDKWrapper>
         </Show>
-        <Show when={theme() === 'shadcn/ui'}>
+        <Show when={theme() === 'shadcn'}>
           <CMDKWrapper>
             <ShadcnCMDK />
           </CMDKWrapper>
@@ -172,7 +172,7 @@ const themes = [
   },
   {
     icon: ShadcnIcon,
-    key: 'shadcn/ui',
+    key: 'shadcn',
   },
 ]
 
@@ -301,18 +301,8 @@ function Footer() {
         <div class={styles.footerText}>
           Crafted by{' '}
           <a href="https://github.com/create-signal" target="_blank" rel="noopener noreferrer">
-            <img src="/paco.png" alt="Avatar of Kiz" />
+            <img src="/kiz.jpg" alt="Avatar of Kiz" />
             Kieran
-          </a>
-          ,{' '}
-          <a href="https://paco.me" target="_blank" rel="noopener noreferrer">
-            <img src="/paco.png" alt="Avatar of Paco" />
-            Paco
-          </a>{' '}
-          and{' '}
-          <a href="https://rauno.me" target="_blank" rel="noopener noreferrer">
-            <img src="/rauno.jpeg" alt="Avatar of Rauno" />
-            Rauno
           </a>
         </div>
       </footer>
