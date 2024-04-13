@@ -1,4 +1,4 @@
-import { Command } from 'cmdk'
+import { Command } from 'cmdk-solid'
 import { JSX, createSignal } from 'solid-js'
 import { Show } from 'solid-js/web'
 

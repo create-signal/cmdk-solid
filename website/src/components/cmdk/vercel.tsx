@@ -1,4 +1,4 @@
-import { Command } from 'cmdk'
+import { Command } from 'cmdk-solid'
 import { For, JSX, Show, createSignal } from 'solid-js'
 
 export function VercelCMDK() {

@@ -16,7 +16,7 @@ import {
 } from '../components'
 import { Motion, MotionComponentProps } from 'solid-motionone'
 import { Accessor, JSX, createContext, createEffect, createSignal, onCleanup, onMount, useContext } from 'solid-js'
-import packageJSON from '../../../cmdk/package.json'
+import packageJSON from '../../../cmdk-solid/package.json'
 import styles from '../styles/index.module.scss'
 import { For, Show } from 'solid-js/web'
 import { createVisibilityObserver } from '@solid-primitives/intersection-observer'

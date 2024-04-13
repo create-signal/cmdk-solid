@@ -1,5 +1,5 @@
 import { useSearchParams } from '@solidjs/router'
-import { Command } from 'cmdk'
+import { Command } from 'cmdk-solid'
 
 const Page = () => {
   const [params] = useSearchParams()

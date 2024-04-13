@@ -3,14 +3,14 @@
   "type": "module",
   "scripts": {
     "dev": "vinxi dev",
-    "build": "vinxi build",
+    "build": "pnpm -F 'website^...' build && npx vinxi build",
     "start": "vinxi start"
   },
   "dependencies": {
     "@kobalte/core": "^0.12.4",
     "@solidjs/router": "^0.13.0",
     "@solidjs/start": "^0.7.4",
-    "cmdk": "workspace:*",
+    "cmdk-solid": "workspace:*",
     "solid-js": "^1.8.15",
     "vinxi": "^0.3.10"
   },

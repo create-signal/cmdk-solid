@@ -1,5 +1,5 @@
 import { useSearchParams, useIsRouting } from '@solidjs/router'
-import { Command } from 'cmdk'
+import { Command } from 'cmdk-solid'
 import { createEffect, createSignal } from 'solid-js'
 
 const Page = () => {

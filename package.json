@@ -15,7 +15,7 @@
   "files": [
     "dist"
   ],
-  "private": false,
+  "private": true,
   "sideEffects": false,
   "type": "module",
   "main": "./dist/index.js",
@@ -40,8 +40,8 @@
   },
   "typesVersions": {},
   "scripts": {
-    "build": "pnpm -F cmdk build",
-    "dev": "pnpm -F cmdk build --watch",
+    "build": "pnpm -F cmdk-solid build",
+    "dev": "pnpm -F cmdk-solid build --watch",
     "website": "pnpm -F website dev",
     "testsite": "pnpm -F test dev",
     "format": "prettier '**/*.{js,jsx,ts,tsx,json,md,mdx,css,scss,yaml,yml}' --write",

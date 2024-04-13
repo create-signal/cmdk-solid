@@ -1,5 +1,5 @@
 {
-  "name": "cmdk",
+  "name": "cmdk-solid",
   "version": "1.0.0",
   "license": "MIT",
   "main": "./dist/index.js",
@@ -34,14 +34,15 @@
   "sideEffects": false,
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/pacocoursey/cmdk.git"
+    "url": "git+https://github.com/create-signal/cmdk-solid.git"
   },
   "bugs": {
-    "url": "https://github.com/pacocoursey/cmdk/issues"
+    "url": "https://github.com/create-signal/cmdk-solid/issues"
   },
-  "homepage": "https://github.com/pacocoursey/cmdk#readme",
+  "homepage": "https://github.com/create-signal/cmdk-solid#readme",
   "author": {
-    "url": "https://github.com/pacocoursey"
+    "name": "Kieran Molloy",
+    "url": "https://github.com/create-signal"
   },
   "browser": {},
   "typesVersions": {},

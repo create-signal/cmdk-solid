@@ -4,7 +4,7 @@
 
 # ⌘K [![cmdk-solid minzip package size](https://img.shields.io/bundlephobia/minzip/cmdk-solid)](https://www.npmjs.com/package/cmdk-solid?activeTab=code) [![cmdk package version](https://img.shields.io/npm/v/cmdk.svg?colorB=green)](https://www.npmjs.com/package/cmdk-solid)
 
-⌘K is a command menu SolidJS component that can also be used as an accessible combobox. You render items, it filters and sorts them automatically. ⌘K supports a fully composable API <sup><sup>[How?](/ARCHITECTURE.md)</sup></sup>, so you can wrap items in other components or even as static JSX.
+⌘K is a command menu SolidJS component that can also be used as an accessible combobox. You render items, it filters and sorts them automatically. ⌘K supports a fully composable API, so you can wrap items in other components or even as static JSX.
 
 ⌘K is a port for SolidJS of [pacocoursey's](https://github.com/pacocoursey/cmdk) wonderful CMDK component.
 

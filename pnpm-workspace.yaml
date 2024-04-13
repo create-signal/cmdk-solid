@@ -1,4 +1,4 @@
 packages:
   - 'website'
-  - 'cmdk'
+  - 'cmdk-solid'
   - 'test'

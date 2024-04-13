@@ -63,7 +63,7 @@ importers:
         specifier: ^0.33.0
         version: 0.33.0(jsdom@22.1.0)
 
-  cmdk:
+  cmdk-solid:
     dependencies:
       '@kobalte/core':
         specifier: ^0.12.4
@@ -92,9 +92,9 @@ importers:
       '@solidjs/start':
         specifier: ^0.7.4
         version: 0.7.5(solid-js@1.8.15)(vinxi@0.3.10)(vite@4.5.2)
-      cmdk:
+      cmdk-solid:
         specifier: workspace:*
-        version: link:../cmdk
+        version: link:../cmdk-solid
       solid-js:
         specifier: ^1.8.15
         version: 1.8.15
@@ -122,9 +122,9 @@ importers:
       clsx:
         specifier: ^2.1.0
         version: 2.1.0
-      cmdk:
+      cmdk-solid:
         specifier: workspace:*
-        version: link:../cmdk
+        version: link:../cmdk-solid
       copy-to-clipboard:
         specifier: ^3.3.3
         version: 3.3.3

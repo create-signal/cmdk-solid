@@ -1,4 +1,4 @@
-import { Command, CommandItemProps, useCommandState } from 'cmdk'
+import { Command, CommandItemProps, useCommandState } from 'cmdk-solid'
 import { For, Show, createEffect, createSignal, onCleanup, onMount } from 'solid-js'
 import { Popover } from '@kobalte/core'
 

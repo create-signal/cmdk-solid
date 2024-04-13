@@ -7,7 +7,7 @@ import {
   CommandGroupProps,
   CommandSeparatorProps,
   CommandItemProps,
-} from 'cmdk'
+} from 'cmdk-solid'
 
 import { cn } from '~/lib/utils'
 import { Dialog, DialogContent } from '~/components/ui/dialog'

@@ -1,5 +1,5 @@
 import { Popover } from '@kobalte/core'
-import { Command } from 'cmdk'
+import { Command } from 'cmdk-solid'
 import { For, JSX, createEffect, createSignal, onCleanup, onMount } from 'solid-js'
 import { FigmaIcon, LinearIcon, Logo, RaycastIcon, SlackIcon, YouTubeIcon } from '../../components'
 
