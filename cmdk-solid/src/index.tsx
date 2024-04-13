@@ -291,6 +291,9 @@ const Command: Component<CommandRootProps> = (props) => {
     },
     // Track item lifecycle (mount, unmount)
     item: (id: string, groupId?: string) => {
+      if (!listInnerRef()) {
+        console.warn('Mount Command.Item inside a Command.List component.')
+      }
       setState((state) => {
         return {
           ...state,
@@ -333,6 +336,9 @@ const Command: Component<CommandRootProps> = (props) => {
     },
     // Track group lifecycle (mount, unmount)
     group: (id) => {
+      if (!listInnerRef()) {
+        console.warn('Mount Command.Group inside a Command.List component.')
+      }
       setState('groups', (state) => {
         return {
           [id]: [],
@@ -454,7 +460,7 @@ const Command: Component<CommandRootProps> = (props) => {
   }
 
   function getSelectedItem() {
-    return listInnerRef()!.querySelector(`${ITEM_SELECTOR}[aria-selected="true"]`)
+    return listInnerRef()?.querySelector(`${ITEM_SELECTOR}[aria-selected="true"]`)
   }
 
   function getValidItems() {
