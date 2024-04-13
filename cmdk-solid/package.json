@@ -1,6 +1,6 @@
 {
   "name": "cmdk-solid",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "license": "MIT",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
