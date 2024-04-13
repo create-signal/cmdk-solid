@@ -139,13 +139,7 @@ Or disable filtering and sorting entirely:
 ```tsx
 <Command shouldFilter={false}>
   <Command.List>
-    {filteredItems.map((item) => {
-      return (
-        <Command.Item key={item} value={item}>
-          {item}
-        </Command.Item>
-      )
-    })}
+    <For each={filteredItems()}>{(item) => <Command.Item value={item}>{item}</Command.Item>}</For>
   </Command.List>
 </Command>
 ```
@@ -392,11 +386,7 @@ return (
       <Show when={loading()}>
         <Command.Loading>Fetching words…</Command.Loading>
       </Show>
-      <For each={items()}>
-        {(item) => {
-          return <Command.Item value={item}>{item}</Command.Item>
-        }}
-      </For>
+      <For each={items()}>{(item) => <Command.Item value={item}>{item}</Command.Item>}</For>
     </Command.List>
   </Command>
 )
