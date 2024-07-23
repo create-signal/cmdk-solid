@@ -14,6 +14,7 @@ build/
 dist/
 node_modules/
 .vercel
+test-results/
 
 # tsup
 tsup.config.bundled_*.{m,c,}s
