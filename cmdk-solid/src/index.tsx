@@ -12,6 +12,7 @@ import {
   createMemo,
   createSignal,
   createUniqueId,
+  on,
   onCleanup,
   onMount,
   splitProps,
@@ -683,10 +684,22 @@ const Item: ParentComponent<CommandItemProps> = (props) => {
   onMount(() => {
     const element = ref()
     if (!element || props.disabled) return
-    element.addEventListener(SELECT_EVENT, onSelect)
-    onCleanup(() => element.removeEventListener(SELECT_EVENT, onSelect))
     setRendered(true)
   })
+
+  createEffect(
+    on(
+      () => ({ ref: ref() }),
+      ({ ref }) => {
+        if (!ref) return
+        ref.addEventListener(SELECT_EVENT, onSelect)
+
+        onCleanup(() => {
+          ref.removeEventListener(SELECT_EVENT, onSelect)
+        })
+      },
+    ),
+  )
 
   function onSelect() {
     select()
