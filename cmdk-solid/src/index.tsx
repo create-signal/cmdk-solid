@@ -446,21 +446,19 @@ const Command: Component<CommandRootProps> = (props) => {
   }
 
   function scrollSelectedIntoView() {
-    const item = getSelectedItem()
+    requestAnimationFrame(() => {
+      const item = getSelectedItem()
 
-    if (item) {
-      if (item.parentElement?.firstChild === item) {
-        // First item in Group, ensure heading is in view
-        const groupHeader = item.closest(GROUP_SELECTOR)?.querySelector(GROUP_HEADING_SELECTOR) //?.scrollIntoView({ block: 'nearest' })
-
-        if (groupHeader) {
-          scrollIntoViewInsideParent(groupHeader as HTMLElement)
+      if (item) {
+        if (item.parentElement?.firstChild === item) {
+          // First item in Group, ensure heading is in view
+          item.closest(GROUP_SELECTOR)?.querySelector(GROUP_HEADING_SELECTOR)?.scrollIntoView({ block: 'nearest' })
         }
-      }
 
-      // Ensure the item is always in view
-      scrollIntoViewInsideParent(item as HTMLElement)
-    }
+        // Ensure the item is always in view
+        item.scrollIntoView({ block: 'nearest' })
+      }
+    })
   }
 
   function getSelectedItem() {
@@ -1097,26 +1095,3 @@ const srOnlyStyles = {
   whiteSpace: 'nowrap',
   borderWidth: '0',
 } as const
-
-function getScrollableParent(element: HTMLElement | null) {
-  while (element) {
-    const style = getComputedStyle(element)
-    const overflowY = style.overflowY
-    const isScrollable = overflowY === 'auto' || overflowY === 'scroll'
-
-    if (isScrollable && element.scrollHeight > element.clientHeight) {
-      return element
-    }
-    element = element.parentElement
-  }
-  return document.documentElement // Fallback to the root document
-}
-
-function scrollIntoViewInsideParent(target: HTMLElement) {
-  const scrollableParent = getScrollableParent(target)
-  if (scrollableParent) {
-    scrollableParent.scrollTo({
-      top: target.offsetTop - scrollableParent.offsetTop,
-    })
-  }
-}
