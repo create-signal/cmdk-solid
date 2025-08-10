@@ -1,4 +1,4 @@
-import { Dialog as KobalteDialog } from '@kobalte/core'
+import * as KobalteDialog from '@kobalte/core/dialog'
 import { mergeDefaultProps, mergeRefs } from '@kobalte/utils'
 import { trackDeep } from '@solid-primitives/deep'
 import {
