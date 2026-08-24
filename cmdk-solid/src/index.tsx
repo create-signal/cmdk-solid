@@ -12,6 +12,7 @@ import {
   merge,
   omit,
   onSettled,
+  untrack,
   useContext,
 } from 'solid-js'
 import type { Accessor, Component, ParentComponent } from 'solid-js'
@@ -193,10 +194,16 @@ const useStore = () => useContext(StoreContext)
 const GroupContext = createContext<Accessor<Group | undefined>>(() => undefined)
 
 const Command: Component<CommandRootProps> = (props) => {
+  const [value, setValue] = createSignal<string>(() => props.value?.trim() ?? props.defaultValue ?? '')
+
   const [state, setState] = createStore<State>({
     search: '',
-    value: props.value ?? props.defaultValue ?? '',
-    filtered: { count: 0, items: {}, groups: [] },
+    get value(): State['value'] {
+      return value()
+    },
+    get filtered(): State['filtered'] {
+      return filtered()
+    },
     items: [],
     groups: {},
     ids: {},
@@ -204,30 +211,23 @@ const Command: Component<CommandRootProps> = (props) => {
 
   const mergedProps = mergeDefaultProps({ vimBindings: true, disablePointerSelection: false }, props)
 
-  createEffect(
-    () => {
-      trackDeep(state.ids)
-      const skipFiltering = !state.search || mergedProps.shouldFilter === false
+  const filtered = createMemo<State['filtered']>(() => {
+    trackDeep(state.ids)
+    const skipFiltering = !state.search || mergedProps.shouldFilter === false
 
-      const items: Record<string, number> = state.items.reduce(
-        (acc, id: string) => {
-          acc[id] = skipFiltering ? 1 : score(state.ids[id]!.value, state.ids[id]!.keywords)
-          return acc
-        },
-        {} as Record<string, number>,
-      )
-      const groups = Object.keys(state.groups).filter((groupId) => {
-        return state.groups[groupId]!.some((id: string) => (items[id] || 0) > 0)
-      })
-      const count = Object.values(items).filter((score) => score > 0).length
-      return { count, items, groups }
-    },
-    (filtered) => {
-      setState((draft) => {
-        draft.filtered = filtered
-      })
-    },
-  )
+    const items: Record<string, number> = state.items.reduce(
+      (acc, id: string) => {
+        acc[id] = skipFiltering ? 1 : score(state.ids[id]!.value, state.ids[id]!.keywords)
+        return acc
+      },
+      {} as Record<string, number>,
+    )
+    const groups = Object.keys(state.groups).filter((groupId) => {
+      return state.groups[groupId]!.some((id: string) => (items[id] || 0) > 0)
+    })
+    const count = Object.values(items).filter((score) => score > 0).length
+    return { count, items, groups }
+  })
 
   const etc = omit(
     mergedProps,
@@ -250,20 +250,6 @@ const Command: Component<CommandRootProps> = (props) => {
 
   const schedule = useScheduleLayoutEffect()
 
-  /** Controlled mode `value` handling. */
-  createEffect(
-    () => mergedProps.value,
-    (value) => {
-      if (value === undefined) return
-      const v = value.trim()
-      if (v != state.value) {
-        setState((draft) => {
-          draft.value = v
-        })
-      }
-    },
-  )
-
   //TODO When getSelectedItem changes we should scroll it into view
   onSettled(() => {
     schedule(6, scrollSelectedIntoView)
@@ -273,10 +259,14 @@ const Command: Component<CommandRootProps> = (props) => {
     state,
     snapshot: () => trackDeep(state),
     setState: (key, value, opts) => {
-      if (Object.is(state[key], value)) return
-      setState((draft) => {
-        draft[key] = value
-      })
+      if (untrack(() => Object.is(state[key], value))) return
+      if (key === 'value') {
+        setValue(value as State['value'])
+      } else {
+        setState((draft) => {
+          draft[key] = value
+        })
+      }
 
       if (key === 'search') {
         //sort()
@@ -644,7 +634,7 @@ const Item: ParentComponent<CommandItemProps> = (props) => {
   const [ref, setRef] = createSignal<HTMLDivElement>()
   const groupContext = useContext(GroupContext)
   const context = useCommand()
-  const [rendered, setRendered] = createSignal(false)
+  const rendered = createMemo<boolean>((wasRendered) => wasRendered || (!!ref() && !props.disabled))
 
   onSettled(() => {
     if (!forceMount()) {
@@ -652,15 +642,16 @@ const Item: ParentComponent<CommandItemProps> = (props) => {
     }
   })
 
-  //? Tracks the value of the item and updates it in context and on the [data-value] attribute
-  const [value, setValue] = createSignal(props.value || '')
+  const [textValue, setTextValue] = createSignal('')
 
   createEffect(
-    () => props.value || ref()?.textContent || '',
-    (next) => {
-      if (next) setValue(next)
+    () => ref(),
+    (el) => {
+      if (el) setTextValue(el.textContent || '')
     },
   )
+
+  const value = () => props.value || textValue()
 
   createEffect(
     () => ({ value: value(), keywords: props.keywords, el: ref() }),
@@ -683,14 +674,6 @@ const Item: ParentComponent<CommandItemProps> = (props) => {
       : !state.search
       ? true
       : (state.filtered.items[id] || 0) > 0,
-  )
-
-  createEffect(
-    () => ref(),
-    (el) => {
-      if (!el || props.disabled) return
-      setRendered(true)
-    },
   )
 
   createEffect(
@@ -759,14 +742,16 @@ const Group: ParentComponent<CommandGroupProps> = (props) => {
     return context.group(id)
   })
 
-  const [value, setValue] = createSignal(props.value || '')
+  const [headerValue, setHeaderValue] = createSignal('')
 
   createEffect(
-    () => props.value || headerRef()?.textContent || '',
-    (next) => {
-      if (next) setValue(next)
+    () => headerRef(),
+    (el) => {
+      if (el) setHeaderValue(el.textContent || '')
     },
   )
+
+  const value = () => props.value || headerValue()
 
   createEffect(
     () => ({ value: value(), el: ref() }),
