@@ -1,5 +1,4 @@
 import * as KobalteDialog from '@kobalte/core/dialog'
-import { trackDeep } from '@solid-primitives/deep'
 import {
   Show,
   createContext,
@@ -132,7 +131,7 @@ export type CommandRootProps = Children &
   }
 
 type Context = {
-  value: (id: string, value: string, keywords?: string[]) => void
+  value: (id: string, value: Accessor<string>, keywords?: Accessor<string[] | undefined>) => () => void
   item: (id: string, groupId?: string) => () => void
   group: (id: string) => () => void
   filter: () => boolean
@@ -147,18 +146,22 @@ type Context = {
   setListInnerRef: (el: HTMLDivElement | null) => void
 }
 
+type ItemValue = {
+  value: Accessor<string>
+  keywords?: Accessor<string[] | undefined>
+}
+
 type State = {
   search: string
   value: string
   filtered: { count: number; items: Record<string, number>; groups: string[] }
   items: string[]
   groups: Record<string, string[]>
-  ids: Record<string, { value: string; keywords?: string[] }>
+  ids: Record<string, ItemValue>
 }
 
 type Store = {
   state: State
-  snapshot: () => State
   setState: <K extends keyof State>(key: K, value: State[K], opts?: any) => void
 }
 
@@ -212,12 +215,12 @@ const Command: Component<CommandRootProps> = (props) => {
   const mergedProps = mergeDefaultProps({ vimBindings: true, disablePointerSelection: false }, props)
 
   const filtered = createMemo<State['filtered']>(() => {
-    trackDeep(state.ids)
     const skipFiltering = !state.search || mergedProps.shouldFilter === false
 
     const items: Record<string, number> = state.items.reduce(
       (acc, id: string) => {
-        acc[id] = skipFiltering ? 1 : score(state.ids[id]!.value, state.ids[id]!.keywords)
+        const registered = state.ids[id]
+        acc[id] = skipFiltering ? 1 : registered ? score(registered.value(), registered.keywords?.()) : 0
         return acc
       },
       {} as Record<string, number>,
@@ -257,7 +260,6 @@ const Command: Component<CommandRootProps> = (props) => {
 
   const store: Store = {
     state,
-    snapshot: () => trackDeep(state),
     setState: (key, value, opts) => {
       if (untrack(() => Object.is(state[key], value))) return
       if (key === 'value') {
@@ -288,13 +290,16 @@ const Command: Component<CommandRootProps> = (props) => {
   }
 
   const context: Context = {
-    value: (id: string, value: string, keywords?: string[]) => {
+    value: (id, value, keywords) => {
       setState((draft) => {
         draft.ids[id] = { value, keywords }
       })
 
-      //! Causes a re-render loop, I should investigate further
-      //sort()
+      return () => {
+        setState((draft) => {
+          delete draft.ids[id]
+        })
+      }
     },
     // Track item lifecycle (mount, unmount)
     item: (id: string, groupId?: string) => {
@@ -327,7 +332,6 @@ const Command: Component<CommandRootProps> = (props) => {
             const groupIndex = group?.indexOf(id) ?? -1
             if (group && groupIndex !== -1) group.splice(groupIndex, 1)
           }
-          delete draft.ids[id]
         })
 
         // Batch this, multiple items could be removed in one pass
@@ -347,7 +351,6 @@ const Command: Component<CommandRootProps> = (props) => {
       return () => {
         setState((draft) => {
           delete draft.groups[id]
-          delete draft.ids[id]
         })
       }
     },
@@ -637,8 +640,13 @@ const Item: ParentComponent<CommandItemProps> = (props) => {
   const rendered = createMemo<boolean>((wasRendered) => wasRendered || (!!ref() && !props.disabled))
 
   onSettled(() => {
-    if (!forceMount()) {
-      return context.item(id, groupContext()?.id)
+    const unregisterValue = context.value(id, value, () => props.keywords)
+    if (forceMount()) return unregisterValue
+
+    const unregisterItem = context.item(id, groupContext()?.id)
+    return () => {
+      unregisterItem()
+      unregisterValue()
     }
   })
 
@@ -654,9 +662,8 @@ const Item: ParentComponent<CommandItemProps> = (props) => {
   const value = () => props.value || textValue()
 
   createEffect(
-    () => ({ value: value(), keywords: props.keywords, el: ref() }),
-    ({ value, keywords, el }) => {
-      context.value(id, value, keywords)
+    () => ({ value: value(), el: ref() }),
+    ({ value, el }) => {
       el?.setAttribute(VALUE_ATTR, value)
     },
   )
@@ -739,7 +746,12 @@ const Group: ParentComponent<CommandGroupProps> = (props) => {
   })
 
   onSettled(() => {
-    return context.group(id)
+    const unregisterValue = context.value(id, value)
+    const unregisterGroup = context.group(id)
+    return () => {
+      unregisterGroup()
+      unregisterValue()
+    }
   })
 
   const [headerValue, setHeaderValue] = createSignal('')
@@ -756,7 +768,6 @@ const Group: ParentComponent<CommandGroupProps> = (props) => {
   createEffect(
     () => ({ value: value(), el: ref() }),
     ({ value, el }) => {
-      context.value(id, value)
       el?.setAttribute(VALUE_ATTR, value)
     },
   )

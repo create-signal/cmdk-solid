@@ -37,13 +37,6 @@ importers:
         version: 8.67.0(eslint@10.9.0(jiti@1.21.7))(typescript@6.0.3)
 
   cmdk-solid:
-    dependencies:
-      '@solid-primitives/deep':
-        specifier: 1.0.0-next.3
-        version: 1.0.0-next.3(@solidjs/web@2.0.0-rc.1(solid-js@2.0.0-rc.1))(solid-js@2.0.0-rc.1)
-      '@solid-primitives/mutation-observer':
-        specifier: 3.0.0-next.2
-        version: 3.0.0-next.2(@solidjs/web@2.0.0-rc.1(solid-js@2.0.0-rc.1))(solid-js@2.0.0-rc.1)
     devDependencies:
       '@kobalte/core':
         specifier: 2.0.0-alpha.0
@@ -908,12 +901,6 @@ packages:
     peerDependencies:
       solid-js: ^2.0.0-rc.0
 
-  '@solid-primitives/deep@1.0.0-next.3':
-    resolution: {integrity: sha512-PYus+PGfzKxLlumt7x25MvDh3vFrfcoUrus8byeboJEQcD+KTFHwi4Jt4ZmKHDJD+ZjtM3S81z3Ibt50LP5fuA==}
-    peerDependencies:
-      '@solidjs/web': ^2.0.0-rc.0
-      solid-js: ^2.0.0-rc.0
-
   '@solid-primitives/event-listener@3.0.0-next.3':
     resolution: {integrity: sha512-DU89Vh/z7F1RTvL69RDDOyIoZ0TeYc/Mrdf+pSIGL5WORjL8TxKc91weBRJUrbeA4Co9bHJs+buSd3NPWbxWAg==}
     peerDependencies:
@@ -970,18 +957,6 @@ packages:
 
   '@solid-primitives/media@4.0.0-next.2':
     resolution: {integrity: sha512-jTua+YRSAe2u3z1kZRPIunANI+JSQl0U2pOsDVqCzKgp/nzZC1WsodyFluiSARD9SICgFnzHqlD+EmXzKgp/Mg==}
-    peerDependencies:
-      '@solidjs/web': ^2.0.0-rc.0
-      solid-js: ^2.0.0-rc.0
-
-  '@solid-primitives/memo@2.0.0-next.2':
-    resolution: {integrity: sha512-ybYxnf+rR1voO5C4ok5bSarmiee/XBDHOsikcmhW7K0QxJKI0H2PiHu4qLnv1Z03T6/5kDT1LBizgHGWNYy6jA==}
-    peerDependencies:
-      '@solidjs/web': ^2.0.0-rc.0
-      solid-js: ^2.0.0-rc.0
-
-  '@solid-primitives/mutation-observer@3.0.0-next.2':
-    resolution: {integrity: sha512-QbBVd/3B4vLJh7Hbd2nbW2AVXOrWeRNvXIojkS8cr2DfnnT2/+MAOl7gJmowuIfbZmoLBvgCFmaBnNXg31BzVQ==}
     peerDependencies:
       '@solidjs/web': ^2.0.0-rc.0
       solid-js: ^2.0.0-rc.0
@@ -2622,12 +2597,6 @@ snapshots:
     transitivePeerDependencies:
       - '@solidjs/web'
 
-  '@solid-primitives/deep@1.0.0-next.3(@solidjs/web@2.0.0-rc.1(solid-js@2.0.0-rc.1))(solid-js@2.0.0-rc.1)':
-    dependencies:
-      '@solid-primitives/memo': 2.0.0-next.2(@solidjs/web@2.0.0-rc.1(solid-js@2.0.0-rc.1))(solid-js@2.0.0-rc.1)
-      '@solidjs/web': 2.0.0-rc.1(solid-js@2.0.0-rc.1)
-      solid-js: 2.0.0-rc.1
-
   '@solid-primitives/event-listener@3.0.0-next.3(@solidjs/web@2.0.0-rc.1(solid-js@2.0.0-rc.1))(solid-js@2.0.0-rc.1)':
     dependencies:
       '@solid-primitives/utils': 7.0.0-next.4(@solidjs/web@2.0.0-rc.1(solid-js@2.0.0-rc.1))(solid-js@2.0.0-rc.1)
@@ -2690,18 +2659,6 @@ snapshots:
       '@solid-primitives/event-listener': 3.0.0-next.3(@solidjs/web@2.0.0-rc.1(solid-js@2.0.0-rc.1))(solid-js@2.0.0-rc.1)
       '@solid-primitives/rootless': 2.0.0-next.2(@solidjs/web@2.0.0-rc.1(solid-js@2.0.0-rc.1))(solid-js@2.0.0-rc.1)
       '@solid-primitives/static-store': 1.0.0-next.2(@solidjs/web@2.0.0-rc.1(solid-js@2.0.0-rc.1))(solid-js@2.0.0-rc.1)
-      '@solid-primitives/utils': 7.0.0-next.4(@solidjs/web@2.0.0-rc.1(solid-js@2.0.0-rc.1))(solid-js@2.0.0-rc.1)
-      '@solidjs/web': 2.0.0-rc.1(solid-js@2.0.0-rc.1)
-      solid-js: 2.0.0-rc.1
-
-  '@solid-primitives/memo@2.0.0-next.2(@solidjs/web@2.0.0-rc.1(solid-js@2.0.0-rc.1))(solid-js@2.0.0-rc.1)':
-    dependencies:
-      '@solid-primitives/utils': 7.0.0-next.4(@solidjs/web@2.0.0-rc.1(solid-js@2.0.0-rc.1))(solid-js@2.0.0-rc.1)
-      '@solidjs/web': 2.0.0-rc.1(solid-js@2.0.0-rc.1)
-      solid-js: 2.0.0-rc.1
-
-  '@solid-primitives/mutation-observer@3.0.0-next.2(@solidjs/web@2.0.0-rc.1(solid-js@2.0.0-rc.1))(solid-js@2.0.0-rc.1)':
-    dependencies:
       '@solid-primitives/utils': 7.0.0-next.4(@solidjs/web@2.0.0-rc.1(solid-js@2.0.0-rc.1))(solid-js@2.0.0-rc.1)
       '@solidjs/web': 2.0.0-rc.1(solid-js@2.0.0-rc.1)
       solid-js: 2.0.0-rc.1
