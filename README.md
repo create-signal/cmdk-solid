@@ -12,11 +12,20 @@ Every attempt was made to make the behavior identical. The most notable differen
 
 Demo and examples: [https://cmdk-solid.vercel.app/](https://cmdk-solid.vercel.app/)
 
+## Compatibility
+
+| SolidJS | cmdk-solid |
+| ------- | ---------- |
+| 2.x     | 2.x        |
+| 1.x     | 1.x        |
+
 ## Install
 
 ```bash
-pnpm install cmdk-solid
+pnpm install cmdk-solid @kobalte/core
 ```
+
+`@kobalte/core` is a peer dependency — ⌘K renders its dialog with the [Kobalte Dialog](https://kobalte.dev/docs/core/components/dialog).
 
 ## Use
 
@@ -394,16 +403,12 @@ return (
 
 ### Use inside Popover
 
-We recommend using the [Kobalte popover](https://kobalte.dev/docs/core/components/popover) component. ⌘K relies on the Kobalte Dialog component, so this will reduce your bundle size a bit due to shared dependencies.
-
-```bash
-$ pnpm install @kobalte/core
-```
+We recommend using the [Kobalte popover](https://kobalte.dev/docs/core/components/popover) component. ⌘K already renders its dialog with Kobalte, so this reuses a dependency you have rather than adding one.
 
 Render `Command` inside of the popover content:
 
 ```tsx
-import { Popover } from '@kobalte/core'
+import * as Popover from '@kobalte/core/popover'
 
 return (
   <Popover.Root>
