@@ -2,3 +2,6 @@ packages:
   - 'website'
   - 'cmdk-solid'
   - 'test'
+allowBuilds:
+  '@parcel/watcher': true
+  esbuild: true

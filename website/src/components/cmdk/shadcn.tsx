@@ -1,11 +1,4 @@
-import {
-  CalendarIcon,
-  MailIcon,
-  RocketIcon,
-  SettingsIcon,
-  SmileIcon,
-  UserIcon,
-} from '~/components/icons/lucide'
+import { CalendarIcon, MailIcon, RocketIcon, SettingsIcon, SmileIcon, UserIcon } from '~/components/icons/lucide'
 import {
   Command,
   CommandEmpty,
