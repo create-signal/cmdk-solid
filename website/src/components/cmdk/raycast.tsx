@@ -5,7 +5,7 @@ import type { JSX } from '@solidjs/web'
 import { FigmaIcon, LinearIcon, Logo, RaycastIcon, SlackIcon, YouTubeIcon } from '../../components'
 
 export function RaycastCMDK() {
-  const [value, setValue] = createSignal('linear')
+  const [value, setValue] = createSignal('Linear')
   const [inputRef, setInputRef] = createSignal<HTMLInputElement | null>(null)
   const [listRef, setListRef] = createSignal<HTMLInputElement | null>(null)
 
