@@ -1,13 +1,13 @@
 import { Command, CommandItemProps, useCommandState } from 'cmdk-solid'
-import { For, Show, createEffect, createSignal, onCleanup, onMount } from 'solid-js'
-import { Popover } from '@kobalte/core'
+import { For, Show, createEffect, createSignal, onSettled } from 'solid-js'
+import * as Popover from '@kobalte/core/popover'
 
 const CommandMenu = () => {
   const [open, setOpen] = createSignal(true)
   let ref: HTMLDivElement | undefined
 
   // Toggle the menu when ⌘K is pressed
-  onMount(() => {
+  onSettled(() => {
     const down = (e: KeyboardEvent) => {
       if (e.key === 'k' && (e.metaKey || e.ctrlKey)) {
         e.preventDefault()
@@ -16,7 +16,8 @@ const CommandMenu = () => {
     }
 
     document.addEventListener('keydown', down)
-    onCleanup(() => document.removeEventListener('keydown', down))
+
+    return () => document.removeEventListener('keydown', down)
   })
 
   return (
@@ -52,9 +53,10 @@ const CommandMenu = () => {
 const CustomEmpty = () => {
   const search = useCommandState((state) => state.search)
 
-  createEffect(() => {
-    console.log('Searched for', search())
-  })
+  createEffect(
+    () => search(),
+    (value) => console.log('Searched for', value),
+  )
 
   return <Command.Empty>No results found for {search()}</Command.Empty>
 }
@@ -127,7 +129,7 @@ const AsyncCommandMenu = () => {
   const [loading, setLoading] = createSignal(false)
   const [items, setItems] = createSignal<string[]>([])
 
-  onMount(() => {
+  onSettled(() => {
     async function getItems() {
       setLoading(true)
       const res = await asyncResource()

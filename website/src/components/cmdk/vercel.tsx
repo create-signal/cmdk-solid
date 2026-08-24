@@ -1,5 +1,6 @@
 import { Command } from 'cmdk-solid'
-import { For, JSX, Show, createSignal } from 'solid-js'
+import { For, Show, createSignal } from 'solid-js'
+import type { JSX } from '@solidjs/web'
 
 export function VercelCMDK() {
   let ref: HTMLDivElement

@@ -14,11 +14,11 @@ import {
   VercelIcon,
   ShadcnCMDK,
 } from '../components'
-import { Motion, MotionComponentProps } from 'solid-motionone'
-import { Accessor, JSX, createContext, createEffect, createSignal, onCleanup, onMount, useContext } from 'solid-js'
+import { Accessor, createContext, createEffect, createSignal, onSettled, useContext } from 'solid-js'
+import type { JSX } from '@solidjs/web'
 import packageJSON from '../../../cmdk-solid/package.json'
 import styles from '../styles/index.module.scss'
-import { For, Show } from 'solid-js/web'
+import { For, Show } from 'solid-js'
 import { createVisibilityObserver } from '@solid-primitives/intersection-observer'
 
 type TTheme = {
@@ -28,7 +28,7 @@ type TTheme = {
 
 type Themes = 'linear' | 'raycast' | 'vercel' | 'framer' | 'shadcn'
 
-const ThemeContext = createContext<TTheme>({} as TTheme)
+const ThemeContext = createContext<TTheme>()
 
 export default function Index() {
   const [theme, setTheme] = createSignal<Themes>('linear')
@@ -81,11 +81,11 @@ export default function Index() {
           </CMDKWrapper>
         </Show>
 
-        <ThemeContext.Provider value={{ theme, setTheme }}>
+        <ThemeContext value={{ theme, setTheme }}>
           <ThemeSwitcher />
-        </ThemeContext.Provider>
+        </ThemeContext>
 
-        <div aria-hidden class={styles.line} />
+        <div aria-hidden="true" class={styles.line} />
 
         <Codeblock />
       </div>
@@ -94,18 +94,16 @@ export default function Index() {
   )
 }
 
-function CMDKWrapper(props: MotionComponentProps & { children: JSX.Element }) {
+function CMDKWrapper(props: { children: JSX.Element }) {
   return (
-    <Motion.div
-      initial={{ opacity: 0, scale: 0.98 }}
-      animate={{ opacity: 1, scale: 1 }}
-      exit={{ opacity: 0, scale: 0.98 }}
-      transition={{ duration: 0.2 }}
+    <div
+      class={styles.cmdkWrapper}
       style={{
         height: '475px',
       }}
-      {...props}
-    />
+    >
+      {props.children}
+    </div>
   )
 }
 
@@ -180,7 +178,7 @@ function ThemeSwitcher() {
   const { theme, setTheme } = useContext(ThemeContext)
   const [showArrowKeyHint, setShowArrowKeyHint] = createSignal(false)
 
-  onMount(() => {
+  onSettled(() => {
     function listener(e: KeyboardEvent) {
       const themeNames = themes.map((t) => t.key)
 
@@ -207,9 +205,7 @@ function ThemeSwitcher() {
 
     document.addEventListener('keydown', listener)
 
-    onCleanup(() => {
-      document.removeEventListener('keydown', listener)
-    })
+    return () => document.removeEventListener('keydown', listener)
   })
 
   return (
@@ -277,8 +273,8 @@ function Codeblock() {
 
   return (
     <div class={styles.codeBlock}>
-      <div class={styles.line2} aria-hidden />
-      <div class={styles.line3} aria-hidden />
+      <div class={styles.line2} aria-hidden="true" />
+      <div class={styles.line3} aria-hidden="true" />
       <Code>{code}</Code>
     </div>
   )
@@ -286,14 +282,15 @@ function Codeblock() {
 
 function Footer() {
   let el: HTMLDivElement | undefined
-  const visibilityState = createVisibilityObserver({ rootMargin: '100px' })(() => el)
+  const visibilityState = createVisibilityObserver(() => el, { rootMargin: '100px', initialValue: false })
   const [visible, setVisible] = createSignal(false)
 
-  createEffect(() => {
-    if (visibilityState()) {
-      setVisible(true)
-    }
-  })
+  createEffect(
+    () => visibilityState(),
+    (isVisible) => {
+      if (isVisible) setVisible(true)
+    },
+  )
 
   return (
     <>

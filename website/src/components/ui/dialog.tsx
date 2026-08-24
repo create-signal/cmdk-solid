@@ -1,8 +1,10 @@
-import { Dialog as DialogPrimitive } from '@kobalte/core'
-import { DialogOverlayProps } from '@kobalte/core/dist/types/dialog'
-import { X } from 'lucide-solid'
-import { Component, JSX, ParentComponent } from 'solid-js'
+import * as DialogPrimitive from '@kobalte/core/dialog'
+import { XIcon } from '~/components/icons/lucide'
+import { Component, ParentComponent } from 'solid-js'
+import type { JSX } from '@solidjs/web'
 import { cn } from '~/lib/utils'
+
+type PartProps<T> = T extends (props: infer P) => unknown ? P : never
 
 const Dialog = DialogPrimitive.Root
 
@@ -12,7 +14,7 @@ const DialogPortal = DialogPrimitive.Portal
 
 const DialogClose = DialogPrimitive.CloseButton
 
-const DialogOverlay: ParentComponent<DialogOverlayProps> = (props) => (
+const DialogOverlay: ParentComponent<PartProps<typeof DialogPrimitive.Overlay>> = (props) => (
   <DialogPrimitive.Overlay
     {...props}
     class={cn(
@@ -22,7 +24,7 @@ const DialogOverlay: ParentComponent<DialogOverlayProps> = (props) => (
   />
 )
 
-const DialogContent: ParentComponent<DialogPrimitive.DialogContentProps> = (props) => (
+const DialogContent: ParentComponent<PartProps<typeof DialogPrimitive.Content>> = (props) => (
   <DialogPortal>
     <DialogOverlay />
     <DialogPrimitive.Content
@@ -34,7 +36,7 @@ const DialogContent: ParentComponent<DialogPrimitive.DialogContentProps> = (prop
     >
       {props.children}
       <DialogPrimitive.CloseButton class="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
-        <X class="h-4 w-4" />
+        <XIcon class="h-4 w-4" />
         <span class="sr-only">Close</span>
       </DialogPrimitive.CloseButton>
     </DialogPrimitive.Content>
@@ -49,12 +51,12 @@ const DialogFooter: ParentComponent<JSX.HTMLAttributes<HTMLDivElement>> = (props
   <div {...props} class={cn('flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2', props.class)} />
 )
 
-const DialogTitle: ParentComponent<DialogPrimitive.DialogTitleProps> = (props) => (
+const DialogTitle: ParentComponent<PartProps<typeof DialogPrimitive.Title>> = (props) => (
   <DialogPrimitive.Title {...props} class={cn('text-lg font-semibold leading-none tracking-tight', props.class)} />
 )
 
-const DialogDescription: ParentComponent<DialogPrimitive.DialogDescriptionProps> = (props) => (
-  <DialogPrimitive.Description {...props} class={cn('text-sm text-muted-foreground', props.class)} {...props} />
+const DialogDescription: ParentComponent<PartProps<typeof DialogPrimitive.Description>> = (props) => (
+  <DialogPrimitive.Description {...props} class={cn('text-sm text-muted-foreground', props.class)} />
 )
 
 export {

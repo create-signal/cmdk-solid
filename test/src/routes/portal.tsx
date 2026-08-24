@@ -1,12 +1,14 @@
 import { Command } from 'cmdk-solid'
-import { Show, createSignal, onMount } from 'solid-js'
-import { Portal } from 'solid-js/web'
+import { Show, createSignal, onSettled } from 'solid-js'
+import { Portal } from '@solidjs/web'
 
 const Page = () => {
   const [render, setRender] = createSignal(false)
   const [search, setSearch] = createSignal('')
   const [open, setOpen] = createSignal(true)
-  onMount(() => setRender(true))
+  onSettled(() => {
+    setRender(true)
+  })
 
   return (
     <Show when={render()}>

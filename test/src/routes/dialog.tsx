@@ -1,10 +1,10 @@
 import { Command } from 'cmdk-solid'
-import { createSignal, onMount } from 'solid-js'
+import { createSignal, onSettled } from 'solid-js'
 
 const Page = () => {
   const [open, setOpen] = createSignal(false)
 
-  onMount(() => {
+  onSettled(() => {
     setOpen(true)
   })
 

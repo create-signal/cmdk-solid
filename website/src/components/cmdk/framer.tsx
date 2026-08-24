@@ -1,6 +1,7 @@
 import { Command } from 'cmdk-solid'
-import { JSX, createSignal } from 'solid-js'
-import { Show } from 'solid-js/web'
+import { createSignal } from 'solid-js'
+import type { JSX } from '@solidjs/web'
+import { Show } from 'solid-js'
 
 export function FramerCMDK() {
   const [value, setValue] = createSignal('Button')

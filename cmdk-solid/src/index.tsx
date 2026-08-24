@@ -1,24 +1,21 @@
-import { Dialog as KobalteDialog } from '@kobalte/core'
-import { mergeDefaultProps, mergeRefs } from '@kobalte/utils'
+import * as KobalteDialog from '@kobalte/core/dialog'
 import { trackDeep } from '@solid-primitives/deep'
 import {
-  Accessor,
-  Component,
-  JSX,
-  ParentComponent,
   Show,
   createContext,
   createEffect,
   createMemo,
   createSignal,
+  createStore,
   createUniqueId,
-  on,
-  onCleanup,
-  onMount,
-  splitProps,
+  flush,
+  merge,
+  omit,
+  onSettled,
   useContext,
 } from 'solid-js'
-import { createStore } from 'solid-js/store'
+import type { Accessor, Component, ParentComponent } from 'solid-js'
+import type { JSX } from '@solidjs/web'
 import { commandScore } from './command-score'
 
 type Children = { children?: JSX.Element }
@@ -135,8 +132,8 @@ export type CommandRootProps = Children &
 
 type Context = {
   value: (id: string, value: string, keywords?: string[]) => void
-  item: (id: string, groupId?: string) => void
-  group: (id: string) => void
+  item: (id: string, groupId?: string) => () => void
+  group: (id: string) => () => void
   filter: () => boolean
   label: Accessor<string>
   disablePointerSelection: Accessor<boolean>
@@ -176,17 +173,24 @@ const ITEM_SELECTOR = `[cmdk-item=""]`
 const VALID_ITEM_SELECTOR = `${ITEM_SELECTOR}:not([aria-disabled="true"])`
 const SELECT_EVENT = `cmdk-item-select`
 const VALUE_ATTR = `data-value`
+const DIALOG_ROOT_KEYS = [
+  'open',
+  'defaultOpen',
+  'onOpenChange',
+  'id',
+  'modal',
+  'preventScroll',
+  'forceMount',
+  'translations',
+] as const
 const defaultFilter: NonNullable<CommandRootProps['filter']> = (value, search, keywords) =>
   commandScore(value, search, keywords)
 
-// @ts-ignore
-const CommandContext = createContext<Context>(undefined)
-const useCommand = () => useContext(CommandContext)!
-// @ts-ignore
-const StoreContext = createContext<Store>(undefined)
-const useStore = () => useContext(StoreContext)!
-// @ts-ignore
-const GroupContext = createContext<Accessor<Group>>(undefined)
+const CommandContext = createContext<Context>()
+const useCommand = () => useContext(CommandContext)
+const StoreContext = createContext<Store>()
+const useStore = () => useContext(StoreContext)
+const GroupContext = createContext<Accessor<Group | undefined>>(() => undefined)
 
 const Command: Component<CommandRootProps> = (props) => {
   const [state, setState] = createStore<State>({
@@ -198,27 +202,35 @@ const Command: Component<CommandRootProps> = (props) => {
     ids: {},
   })
 
-  createEffect(() => {
-    trackDeep(state.ids)
-    const skipFiltering = !state.search || props.shouldFilter === false
-
-    const items: Record<string, number> = state.items.reduce(
-      (acc, id: string) => {
-        acc[id] = skipFiltering ? 1 : score(state.ids[id]!.value, state.ids[id]!.keywords)
-        return acc
-      },
-      {} as Record<string, number>,
-    )
-    const groups = Object.keys(state.groups).filter((groupId) => {
-      return state.groups[groupId]!.some((id: string) => (items[id] || 0) > 0)
-    })
-    const count = Object.values(items).filter((score) => score > 0).length
-    setState('filtered', { count, items, groups })
-  })
-
   const mergedProps = mergeDefaultProps({ vimBindings: true, disablePointerSelection: false }, props)
 
-  const [localProps, etc] = splitProps(mergedProps, [
+  createEffect(
+    () => {
+      trackDeep(state.ids)
+      const skipFiltering = !state.search || mergedProps.shouldFilter === false
+
+      const items: Record<string, number> = state.items.reduce(
+        (acc, id: string) => {
+          acc[id] = skipFiltering ? 1 : score(state.ids[id]!.value, state.ids[id]!.keywords)
+          return acc
+        },
+        {} as Record<string, number>,
+      )
+      const groups = Object.keys(state.groups).filter((groupId) => {
+        return state.groups[groupId]!.some((id: string) => (items[id] || 0) > 0)
+      })
+      const count = Object.values(items).filter((score) => score > 0).length
+      return { count, items, groups }
+    },
+    (filtered) => {
+      setState((draft) => {
+        draft.filtered = filtered
+      })
+    },
+  )
+
+  const etc = omit(
+    mergedProps,
     'label',
     'children',
     'value',
@@ -228,7 +240,7 @@ const Command: Component<CommandRootProps> = (props) => {
     'loop',
     'disablePointerSelection',
     'vimBindings',
-  ])
+  )
 
   const listId = createUniqueId()
   const labelId = createUniqueId()
@@ -239,17 +251,21 @@ const Command: Component<CommandRootProps> = (props) => {
   const schedule = useScheduleLayoutEffect()
 
   /** Controlled mode `value` handling. */
-  createEffect(() => {
-    if (localProps.value !== undefined) {
-      const v = localProps.value.trim()
+  createEffect(
+    () => mergedProps.value,
+    (value) => {
+      if (value === undefined) return
+      const v = value.trim()
       if (v != state.value) {
-        setState('value', v)
+        setState((draft) => {
+          draft.value = v
+        })
       }
-    }
-  })
+    },
+  )
 
   //TODO When getSelectedItem changes we should scroll it into view
-  onMount(() => {
+  onSettled(() => {
     schedule(6, scrollSelectedIntoView)
   })
 
@@ -258,7 +274,9 @@ const Command: Component<CommandRootProps> = (props) => {
     snapshot: () => trackDeep(state),
     setState: (key, value, opts) => {
       if (Object.is(state[key], value)) return
-      setState(key, value)
+      setState((draft) => {
+        draft[key] = value
+      })
 
       if (key === 'search') {
         //sort()
@@ -269,10 +287,10 @@ const Command: Component<CommandRootProps> = (props) => {
           // Scroll the selected item into view
           schedule(5, scrollSelectedIntoView)
         }
-        if (props.value !== undefined) {
+        if (mergedProps.value !== undefined) {
           // If controlled, just call the callback instead of updating state internally
           const newValue = (value ?? '') as string
-          props.onValueChange?.(newValue)
+          mergedProps.onValueChange?.(newValue)
           return
         }
       }
@@ -281,10 +299,9 @@ const Command: Component<CommandRootProps> = (props) => {
 
   const context: Context = {
     value: (id: string, value: string, keywords?: string[]) => {
-      setState('ids', (ids) => ({
-        ...ids,
-        [id]: { value, keywords },
-      }))
+      setState((draft) => {
+        draft.ids[id] = { value, keywords }
+      })
 
       //! Causes a re-render loop, I should investigate further
       //sort()
@@ -294,16 +311,11 @@ const Command: Component<CommandRootProps> = (props) => {
       if (!listInnerRef()) {
         console.warn('Mount Command.Item inside a Command.List component.')
       }
-      setState((state) => {
-        return {
-          ...state,
-          items: Array.from(new Set([...state.items, id])),
-          ...(groupId && {
-            groups: {
-              ...state.groups,
-              [groupId]: [...(state.groups[groupId] || []), id],
-            },
-          }),
+      setState((draft) => {
+        if (!draft.items.includes(id)) draft.items.push(id)
+        if (groupId) {
+          const group = (draft.groups[groupId] ??= [])
+          if (!group.includes(id)) group.push(id)
         }
       })
 
@@ -316,49 +328,44 @@ const Command: Component<CommandRootProps> = (props) => {
         }
       })
 
-      onCleanup(() => {
-        setState((state) => ({
-          ...state,
-          items: state.items.filter((item) => item !== id),
-          ...(groupId && {
-            groups: {
-              ...state.groups,
-              [groupId]: state.groups[groupId]!.filter((item) => item !== id),
-            },
-          }),
-          ids: Object.fromEntries(Object.entries(state.ids).filter(([key]) => key !== id)),
-        }))
+      return () => {
+        setState((draft) => {
+          const index = draft.items.indexOf(id)
+          if (index !== -1) draft.items.splice(index, 1)
+          if (groupId) {
+            const group = draft.groups[groupId]
+            const groupIndex = group?.indexOf(id) ?? -1
+            if (group && groupIndex !== -1) group.splice(groupIndex, 1)
+          }
+          delete draft.ids[id]
+        })
 
         // Batch this, multiple items could be removed in one pass
         const selectedItem = getSelectedItem()
         if (selectedItem?.getAttribute('id') === id) schedule(1, () => selectFirstItem())
-      })
+      }
     },
     // Track group lifecycle (mount, unmount)
     group: (id) => {
       if (!listInnerRef()) {
         console.warn('Mount Command.Group inside a Command.List component.')
       }
-      setState('groups', (state) => {
-        return {
-          [id]: [],
-          ...state,
-        }
+      setState((draft) => {
+        draft.groups[id] ??= []
       })
 
-      onCleanup(() => {
-        setState((state) => ({
-          ...state,
-          groups: Object.fromEntries(Object.entries(state.groups).filter(([key]) => key !== id)),
-          ids: Object.fromEntries(Object.entries(state.ids).filter(([key]) => key !== id)),
-        }))
-      })
+      return () => {
+        setState((draft) => {
+          delete draft.groups[id]
+          delete draft.ids[id]
+        })
+      }
     },
     filter: () => {
-      return props.shouldFilter !== false
+      return mergedProps.shouldFilter !== false
     },
-    label: () => localProps.label || props['aria-label'] || '',
-    disablePointerSelection: () => !!props.disablePointerSelection,
+    label: () => mergedProps.label || props['aria-label'] || '',
+    disablePointerSelection: () => !!mergedProps.disablePointerSelection,
     listId,
     inputId,
     labelId,
@@ -367,7 +374,7 @@ const Command: Component<CommandRootProps> = (props) => {
   }
 
   function score(value: string, keywords?: string[]) {
-    const filter = localProps.filter ?? defaultFilter
+    const filter = mergedProps.filter ?? defaultFilter
     return value ? filter(value, state.search, keywords) : 0
   }
 
@@ -483,7 +490,7 @@ const Command: Component<CommandRootProps> = (props) => {
     // Get item at this index
     let newSelected = items[index + change]
 
-    if (props.loop) {
+    if (mergedProps.loop) {
       newSelected =
         index + change < 0
           ? items[items.length - 1]
@@ -546,7 +553,7 @@ const Command: Component<CommandRootProps> = (props) => {
 
   return (
     <div
-      tabIndex={-1}
+      tabindex={-1}
       {...etc}
       cmdk-root=""
       onKeyDown={(e) => {
@@ -558,7 +565,7 @@ const Command: Component<CommandRootProps> = (props) => {
             case 'n':
             case 'j': {
               // vim keybind down
-              if (localProps.vimBindings && e.ctrlKey) {
+              if (mergedProps.vimBindings && e.ctrlKey) {
                 next(e)
               }
               break
@@ -570,7 +577,7 @@ const Command: Component<CommandRootProps> = (props) => {
             case 'p':
             case 'k': {
               // vim keybind up
-              if (localProps.vimBindings && e.ctrlKey) {
+              if (mergedProps.vimBindings && e.ctrlKey) {
                 prev(e)
               }
               break
@@ -617,11 +624,11 @@ const Command: Component<CommandRootProps> = (props) => {
         // Screen reader only
         style={srOnlyStyles}
       >
-        {localProps.label}
+        {mergedProps.label}
       </label>
-      <StoreContext.Provider value={store}>
-        <CommandContext.Provider value={context}>{props.children}</CommandContext.Provider>
-      </StoreContext.Provider>
+      <StoreContext value={store}>
+        <CommandContext value={context}>{props.children}</CommandContext>
+      </StoreContext>
     </div>
   )
 }
@@ -639,33 +646,31 @@ const Item: ParentComponent<CommandItemProps> = (props) => {
   const context = useCommand()
   const [rendered, setRendered] = createSignal(false)
 
-  onMount(() => {
+  onSettled(() => {
     if (!forceMount()) {
-      return context.item(id, groupContext?.().id)
+      return context.item(id, groupContext()?.id)
     }
   })
 
   //? Tracks the value of the item and updates it in context and on the [data-value] attribute
   const [value, setValue] = createSignal(props.value || '')
 
-  createEffect(() => {
-    if (props.value) {
-      setValue(props.value)
-      return
-    }
-    const innerValue = ref()?.textContent
-    if (innerValue) {
-      setValue(innerValue)
-      return
-    }
-  })
+  createEffect(
+    () => props.value || ref()?.textContent || '',
+    (next) => {
+      if (next) setValue(next)
+    },
+  )
 
-  createEffect(() => {
-    context.value(id, value(), props.keywords)
-    ref()?.setAttribute(VALUE_ATTR, value())
-  })
+  createEffect(
+    () => ({ value: value(), keywords: props.keywords, el: ref() }),
+    ({ value, keywords, el }) => {
+      context.value(id, value, keywords)
+      el?.setAttribute(VALUE_ATTR, value)
+    },
+  )
 
-  const forceMount = () => props.forceMount ?? groupContext?.().forceMount
+  const forceMount = () => props.forceMount ?? groupContext()?.forceMount
   const selected = useCmdk((state) => value() && value() == state.value)
 
   const render = useCmdk((state) =>
@@ -680,24 +685,21 @@ const Item: ParentComponent<CommandItemProps> = (props) => {
       : (state.filtered.items[id] || 0) > 0,
   )
 
-  onMount(() => {
-    const element = ref()
-    if (!element || props.disabled) return
-    setRendered(true)
-  })
+  createEffect(
+    () => ref(),
+    (el) => {
+      if (!el || props.disabled) return
+      setRendered(true)
+    },
+  )
 
   createEffect(
-    on(
-      () => ({ ref: ref() }),
-      ({ ref }) => {
-        if (!ref) return
-        ref.addEventListener(SELECT_EVENT, onSelect)
-
-        onCleanup(() => {
-          ref.removeEventListener(SELECT_EVENT, onSelect)
-        })
-      },
-    ),
+    () => ref(),
+    (el) => {
+      if (!el) return
+      el.addEventListener(SELECT_EVENT, onSelect)
+      return () => el.removeEventListener(SELECT_EVENT, onSelect)
+    },
   )
 
   function onSelect() {
@@ -709,7 +711,7 @@ const Item: ParentComponent<CommandItemProps> = (props) => {
     store.setState('value', value(), true)
   }
 
-  const [localProps, etc] = splitProps(props, ['disabled', 'onSelect', 'value', 'forceMount', 'keywords'])
+  const etc = omit(props, 'disabled', 'onSelect', 'value', 'forceMount', 'keywords')
 
   return (
     <Show when={render()}>
@@ -719,12 +721,12 @@ const Item: ParentComponent<CommandItemProps> = (props) => {
         id={id}
         cmdk-item=""
         role="option"
-        aria-disabled={Boolean(localProps.disabled)}
-        aria-selected={Boolean(selected())}
-        data-disabled={Boolean(localProps.disabled)}
-        data-selected={Boolean(selected())}
-        onPointerMove={localProps.disabled || context.disablePointerSelection() ? undefined : select}
-        onClick={localProps.disabled ? undefined : onSelect}
+        aria-disabled={props.disabled ? 'true' : 'false'}
+        aria-selected={selected() ? 'true' : 'false'}
+        data-disabled={props.disabled ? 'true' : 'false'}
+        data-selected={selected() ? 'true' : 'false'}
+        onPointerMove={props.disabled || context.disablePointerSelection() ? undefined : select}
+        onClick={props.disabled ? undefined : onSelect}
       >
         {props.children}
       </div>
@@ -737,14 +739,14 @@ const Item: ParentComponent<CommandItemProps> = (props) => {
  * Grouped items are always shown together.
  */
 const Group: ParentComponent<CommandGroupProps> = (props) => {
-  const [localProps, etc] = splitProps(props, ['heading', 'value', 'forceMount'])
+  const etc = omit(props, 'heading', 'value', 'forceMount')
   const id = createUniqueId()
   const [ref, setRef] = createSignal<HTMLDivElement>()
   const [headerRef, setHeaderRef] = createSignal<HTMLDivElement>()
   const headingId = createUniqueId()
   const context = useCommand()
   const render = useCmdk((state) => {
-    return localProps.forceMount
+    return props.forceMount
       ? true
       : context.filter() === false
       ? true
@@ -753,34 +755,32 @@ const Group: ParentComponent<CommandGroupProps> = (props) => {
       : state.filtered.groups.includes(id)
   })
 
-  onMount(() => {
-    context.group(id)
+  onSettled(() => {
+    return context.group(id)
   })
 
   const [value, setValue] = createSignal(props.value || '')
 
-  createEffect(() => {
-    if (props.value) {
-      setValue(props.value)
-      return
-    }
-    const innerValue = headerRef()?.textContent
-    if (innerValue) {
-      setValue(innerValue)
-      return
-    }
-  })
+  createEffect(
+    () => props.value || headerRef()?.textContent || '',
+    (next) => {
+      if (next) setValue(next)
+    },
+  )
 
-  createEffect(() => {
-    context.value(id, value())
-    ref()?.setAttribute(VALUE_ATTR, value())
-  })
+  createEffect(
+    () => ({ value: value(), el: ref() }),
+    ({ value, el }) => {
+      context.value(id, value)
+      el?.setAttribute(VALUE_ATTR, value)
+    },
+  )
 
-  const contextValue = () => ({ id, forceMount: localProps.forceMount })
+  const contextValue = () => ({ id, forceMount: props.forceMount })
 
   return (
     <div
-      ref={mergeRefs((el) => setRef(el), props.ref)}
+      ref={[(el: HTMLDivElement) => setRef(el), props.ref]}
       {...etc}
       cmdk-group=""
       id={id}
@@ -788,13 +788,13 @@ const Group: ParentComponent<CommandGroupProps> = (props) => {
       hidden={render() ? undefined : true}
     >
       <Show when={props.heading}>
-        <div cmdk-group-heading="" ref={(el) => setHeaderRef(el)} aria-hidden id={headingId}>
+        <div cmdk-group-heading="" ref={(el) => setHeaderRef(el)} aria-hidden="true" id={headingId}>
           {props.heading}
         </div>
       </Show>
 
       <div cmdk-group-items="" role="group" aria-labelledby={props.heading ? headingId : undefined}>
-        <GroupContext.Provider value={contextValue}>{props.children}</GroupContext.Provider>
+        <GroupContext value={contextValue}>{props.children}</GroupContext>
       </div>
     </div>
   )
@@ -805,12 +805,12 @@ const Group: ParentComponent<CommandGroupProps> = (props) => {
  * Visible when the search query is empty or `alwaysRender` is true, hidden otherwise.
  */
 const Separator: Component<CommandSeparatorProps> = (props) => {
-  const [localProps, etc] = splitProps(props, ['alwaysRender'])
+  const etc = omit(props, 'alwaysRender')
 
   const render = useCmdk((state) => !state.search)
 
   return (
-    <Show when={localProps.alwaysRender || render()}>
+    <Show when={props.alwaysRender || render()}>
       <div {...etc} cmdk-separator="" role="separator" />
     </Show>
   )
@@ -821,7 +821,7 @@ const Separator: Component<CommandSeparatorProps> = (props) => {
  * All props are forwarded to the underyling `input` element.
  */
 const Input: Component<CommandInputProps> = (props) => {
-  const [localProps, etc] = splitProps(props, ['onValueChange', 'ref'])
+  const etc = omit(props, 'onValueChange', 'ref')
   const isControlled = () => props.value != null
   const store = useStore()
   const search = useCmdk((state) => state.search)
@@ -835,15 +835,18 @@ const Input: Component<CommandInputProps> = (props) => {
     return item?.getAttribute('id') || undefined
   })
 
-  createEffect(() => {
-    if (props.value != null) {
-      store.setState('search', props.value)
-    }
-  })
+  createEffect(
+    () => props.value,
+    (value) => {
+      if (value != null) {
+        store.setState('search', value)
+      }
+    },
+  )
 
   return (
     <input
-      ref={localProps.ref}
+      ref={props.ref}
       {...etc}
       cmdk-input=""
       autocomplete="off"
@@ -851,7 +854,7 @@ const Input: Component<CommandInputProps> = (props) => {
       spellcheck={false}
       aria-autocomplete="list"
       role="combobox"
-      aria-expanded={true}
+      aria-expanded="true"
       aria-controls={context.listId}
       aria-labelledby={context.labelId}
       aria-activedescendant={selectedItemId()}
@@ -865,7 +868,7 @@ const Input: Component<CommandInputProps> = (props) => {
         }
 
         //@ts-ignore
-        localProps.onValueChange?.(e.target.value)
+        props.onValueChange?.(e.target.value)
       }}
     />
   )
@@ -877,44 +880,43 @@ const Input: Component<CommandInputProps> = (props) => {
  */
 const List: ParentComponent<CommandListProps> = (props) => {
   const mergedProps = mergeDefaultProps({ label: 'Suggestions' }, props)
-  const [localProps, etc] = splitProps(mergedProps, ['label', 'children', 'ref'])
-  let ref: HTMLDivElement
-  let height: HTMLDivElement | null
+  const etc = omit(mergedProps, 'label', 'children', 'ref')
+  const [wrapperRef, setWrapperRef] = createSignal<HTMLDivElement>()
+  const [sizerRef, setSizerRef] = createSignal<HTMLDivElement>()
 
   const context = useCommand()
 
-  onMount(() => {
-    if (!ref || !height) return
+  createEffect(
+    () => ({ wrapper: wrapperRef(), sizer: sizerRef() }),
+    ({ wrapper, sizer }) => {
+      if (!wrapper || !sizer) return
 
-    const el = height
-    const wrapper = ref
+      let animationFrame: number
 
-    let animationFrame: number
-
-    const observer = new ResizeObserver(() => {
-      animationFrame = requestAnimationFrame(() => {
-        const height = el.offsetHeight
-        wrapper.style.setProperty(`--cmdk-list-height`, height.toFixed(1) + 'px')
+      const observer = new ResizeObserver(() => {
+        animationFrame = requestAnimationFrame(() => {
+          wrapper.style.setProperty(`--cmdk-list-height`, sizer.offsetHeight.toFixed(1) + 'px')
+        })
       })
-    })
-    observer.observe(el)
-    return () => {
-      cancelAnimationFrame(animationFrame)
-      observer.unobserve(el)
-    }
-  })
+      observer.observe(sizer)
+      return () => {
+        cancelAnimationFrame(animationFrame)
+        observer.unobserve(sizer)
+      }
+    },
+  )
 
   return (
     <div
-      ref={mergeRefs((el) => (ref = el), localProps.ref)}
+      ref={[setWrapperRef, mergedProps.ref]}
       {...etc}
       cmdk-list=""
       role="listbox"
-      aria-label={localProps.label}
+      aria-label={mergedProps.label}
       id={context.listId}
     >
       {SlottableWithNestedChildren(props, (child) => (
-        <div ref={mergeRefs((el) => (height = el), context.setListInnerRef)} cmdk-list-sizer="">
+        <div ref={[setSizerRef, context.setListInnerRef]} cmdk-list-sizer="">
           {child}
         </div>
       ))}
@@ -926,16 +928,13 @@ const List: ParentComponent<CommandListProps> = (props) => {
  * Renders the command menu in a Kobalte Dialog.
  */
 const Dialog: ParentComponent<CommandDialogProps> = (props) => {
-  const [localProps, dialogRootProps, etc] = splitProps(
-    props,
-    ['overlayClassName', 'contentClassName', 'container'],
-    ['open', 'defaultOpen', 'onOpenChange', 'id', 'modal', 'preventScroll', 'forceMount', 'translations'],
-  )
+  const dialogRootProps = pick(props, DIALOG_ROOT_KEYS)
+  const etc = omit(props, 'overlayClassName', 'contentClassName', 'container', ...DIALOG_ROOT_KEYS)
   return (
     <KobalteDialog.Root {...dialogRootProps}>
-      <KobalteDialog.Portal mount={localProps.container}>
-        <KobalteDialog.Overlay cmdk-overlay="" class={localProps.overlayClassName} />
-        <KobalteDialog.Content aria-label={props.label} cmdk-dialog="" class={localProps.contentClassName}>
+      <KobalteDialog.Portal mount={props.container}>
+        <KobalteDialog.Overlay cmdk-overlay="" class={props.overlayClassName} />
+        <KobalteDialog.Content aria-label={props.label} cmdk-dialog="" class={props.contentClassName}>
           <Command {...etc} />
         </KobalteDialog.Content>
       </KobalteDialog.Portal>
@@ -951,7 +950,7 @@ const Empty: ParentComponent<CommandEmptyProps> = (props) => {
 
   const render = useCmdk((state) => state.filtered.count === 0 && mounted())
 
-  onMount(() => {
+  onSettled(() => {
     setMounted(true)
   })
   return (
@@ -972,20 +971,20 @@ const Loading: ParentComponent<CommandLoadingProps> = (props) => {
     props,
   )
 
-  const [localProps, etc] = splitProps(mergedProps, ['progress', 'children', 'label'])
+  const etc = omit(mergedProps, 'progress', 'children', 'label')
 
   return (
     <div
       {...etc}
       cmdk-loading=""
       role="progressbar"
-      aria-valuenow={localProps.progress}
+      aria-valuenow={mergedProps.progress}
       aria-valuemin={0}
       aria-valuemax={100}
-      aria-label={localProps.label}
+      aria-label={mergedProps.label}
     >
       {SlottableWithNestedChildren(props, (child) => (
-        <div aria-hidden>{child}</div>
+        <div aria-hidden="true">{child}</div>
       ))}
     </div>
   )
@@ -1053,20 +1052,45 @@ const useScheduleLayoutEffect = () => {
   const [s, ss] = createSignal(0)
   let fns = new Map<string | number, () => void>()
 
-  createEffect(() => {
-    s()
-    queueMicrotask(() => {
-      fns.forEach((f, key) => {
-        f()
+  createEffect(
+    () => s(),
+    () => {
+      queueMicrotask(() => {
+        flush()
+        fns.forEach((f) => {
+          f()
+        })
+        fns = new Map()
       })
-      fns = new Map()
-    })
-  })
+    },
+  )
 
   return (id: string | number, cb: () => void) => {
     fns.set(id, cb)
-    ss(s() + 1)
+    ss((v) => v + 1)
   }
+}
+
+function pick<T extends object, K extends keyof T>(props: T, keys: readonly K[]): Pick<T, K> {
+  const result = {} as Pick<T, K>
+  for (const key of keys) {
+    Object.defineProperty(result, key, {
+      get: () => props[key],
+      enumerable: true,
+    })
+  }
+  return result
+}
+
+function mergeDefaultProps<D extends Record<string, any>, P extends Record<string, any>>(defaults: D, props: P): P & D {
+  const withDefaults = {} as Record<string, any>
+  for (const key of Object.keys(defaults)) {
+    Object.defineProperty(withDefaults, key, {
+      get: () => props[key] ?? defaults[key],
+      enumerable: true,
+    })
+  }
+  return merge(props, withDefaults) as P & D
 }
 
 function SlottableWithNestedChildren(
@@ -1092,6 +1116,6 @@ const srOnlyStyles = {
   margin: '-1px',
   overflow: 'hidden',
   clip: 'rect(0, 0, 0, 0)',
-  whiteSpace: 'nowrap',
-  borderWidth: '0',
+  'white-space': 'nowrap',
+  'border-width': '0',
 } as const

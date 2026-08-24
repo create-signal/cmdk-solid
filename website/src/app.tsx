@@ -1,7 +1,6 @@
-import { Meta, MetaProvider, Title } from '@solidjs/meta'
-import { Router } from '@solidjs/router'
-import { FileRoutes } from '@solidjs/start/router'
-import { Suspense } from 'solid-js'
+import { Meta, Title } from '@solidjs/meta'
+import { Loading } from 'solid-js'
+import { Router } from './router'
 import './styles/globals.scss'
 
 import './styles/cmdk/framer.scss'
@@ -14,19 +13,17 @@ const description = 'Fast, composable, unstyled command menu for SolidJS'
 
 export default function App() {
   return (
-    <Router
-      root={(props) => (
-        <MetaProvider>
+    <Router>
+      {(props) => (
+        <>
           <Title>
             {description} - {title}
           </Title>
           <Meta name="description" content={description} />
 
-          <Suspense>{props.children}</Suspense>
-        </MetaProvider>
+          <Loading>{props.children}</Loading>
+        </>
       )}
-    >
-      <FileRoutes />
     </Router>
   )
 }

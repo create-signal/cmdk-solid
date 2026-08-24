@@ -2,19 +2,24 @@
   "name": "test",
   "type": "module",
   "scripts": {
-    "dev": "vinxi dev",
-    "build": "pnpm -F 'website^...' build && npx vinxi build",
-    "start": "vinxi start"
+    "dev": "vite",
+    "build": "vite build",
+    "start": "vite preview"
   },
   "dependencies": {
-    "@kobalte/core": "^0.12.4",
-    "@solidjs/router": "^0.13.0",
-    "@solidjs/start": "^0.7.4",
+    "@kobalte/core": "2.0.0-alpha.0",
+    "@solidjs/router": "2.0.0-next.17",
+    "@solidjs/web": "2.0.0-rc.1",
     "cmdk-solid": "workspace:*",
-    "solid-js": "^1.8.15",
-    "vinxi": "^0.3.10"
+    "solid-js": "2.0.0-rc.1"
   },
   "engines": {
     "node": ">=18"
+  },
+  "devDependencies": {
+    "@solidjs/vite-plugin": "3.0.0-next.32",
+    "filesystem-routing": "^0.2.1",
+    "typescript": "^5.4.2",
+    "vite": "^8.2.2"
   }
 }

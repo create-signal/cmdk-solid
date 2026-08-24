@@ -1,4 +1,4 @@
-import { JSX } from 'solid-js'
+import type { JSX } from '@solidjs/web'
 import styles from './icons.module.scss'
 
 export function FigmaIcon() {
@@ -85,7 +85,7 @@ export function VercelIcon() {
   )
 }
 
-export function LinearIcon(props: { style?: string }) {
+export function LinearIcon(props: { style?: JSX.CSSProperties | string }) {
   return (
     <svg width="64" height="64" viewBox="0 0 64 64" fill="none" style={props.style}>
       <path
@@ -146,7 +146,7 @@ export function Logo({ children, size = '20px' }: { children: JSX.Element; size?
         height: size,
       }}
     >
-      <div class={styles.bg} aria-hidden>
+      <div class={styles.bg} aria-hidden="true">
         {children}
       </div>
       <div class={styles.inner}>{children}</div>

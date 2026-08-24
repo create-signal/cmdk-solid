@@ -11,9 +11,10 @@ import {
 
 import { cn } from '~/lib/utils'
 import { Dialog, DialogContent } from '~/components/ui/dialog'
-import { Component, JSX, ParentComponent } from 'solid-js'
-import { DialogRootProps } from '@kobalte/core/dist/types/dialog'
-import { Search } from 'lucide-solid'
+import { Component, ParentComponent } from 'solid-js'
+import type { JSX } from '@solidjs/web'
+import { DialogRootProps } from '@kobalte/core/dialog'
+import { SearchIcon } from '~/components/icons/lucide'
 
 const Command: ParentComponent<CommandRootProps> = (props) => (
   <CommandPrimitive
@@ -38,7 +39,7 @@ const CommandDialog: ParentComponent<CommandDialogProps> = (props) => {
 
 const CommandInput: Component<CommandInputProps> = (props) => (
   <div class="flex items-center border-b px-3" cmdk-input-wrapper="">
-    <Search class="mr-2 h-4 w-4 shrink-0 opacity-50" />
+    <SearchIcon class="mr-2 h-4 w-4 shrink-0 opacity-50" />
     <CommandPrimitive.Input
       {...props}
       class={cn(

@@ -10,13 +10,21 @@ const Page = () => {
   const [params] = useSearchParams()
   const isRouting = useIsRouting()
 
-  createEffect(() => {
-    if (!isRouting()) {
-      setShouldFilter(params.shouldFilter === 'false' ? false : true)
-      setCustomFilter(params.customFilter === 'true' ? true : false)
-      setValue(params.initialValue ?? 'ant')
-    }
-  })
+  createEffect(
+    () => ({
+      routing: isRouting(),
+      shouldFilter: params.shouldFilter,
+      customFilter: params.customFilter,
+      initialValue: params.initialValue,
+    }),
+    ({ routing, shouldFilter, customFilter, initialValue }) => {
+      if (routing) return
+      const first = (v: string | string[] | undefined) => (Array.isArray(v) ? v[0] : v)
+      setShouldFilter(first(shouldFilter) !== 'false')
+      setCustomFilter(first(customFilter) === 'true')
+      setValue(first(initialValue) ?? 'ant')
+    },
+  )
 
   return (
     <div>

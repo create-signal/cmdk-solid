@@ -1,6 +1,7 @@
-import { Popover } from '@kobalte/core'
+import * as Popover from '@kobalte/core/popover'
 import { Command } from 'cmdk-solid'
-import { For, JSX, createEffect, createSignal, onCleanup, onMount } from 'solid-js'
+import { For, createEffect, createSignal, onSettled } from 'solid-js'
+import type { JSX } from '@solidjs/web'
 import { FigmaIcon, LinearIcon, Logo, RaycastIcon, SlackIcon, YouTubeIcon } from '../../components'
 
 export function RaycastCMDK() {
@@ -8,9 +9,10 @@ export function RaycastCMDK() {
   const [inputRef, setInputRef] = createSignal<HTMLInputElement | null>(null)
   const [listRef, setListRef] = createSignal<HTMLInputElement | null>(null)
 
-  createEffect(() => {
-    inputRef()?.focus()
-  })
+  createEffect(
+    () => inputRef(),
+    (el) => el?.focus(),
+  )
 
   return (
     <div class="raycast">
@@ -114,7 +116,7 @@ function Item({
 function SubCommand(props: { inputRef: HTMLInputElement | null; listRef: HTMLElement | null; selectedValue: string }) {
   const [open, setOpen] = createSignal(false)
 
-  onMount(() => {
+  onSettled(() => {
     function listener(e: KeyboardEvent) {
       if (e.key === 'k' && e.metaKey) {
         e.preventDefault()
@@ -124,27 +126,21 @@ function SubCommand(props: { inputRef: HTMLInputElement | null; listRef: HTMLEle
 
     document.addEventListener('keydown', listener)
 
-    onCleanup(() => {
-      document.removeEventListener('keydown', listener)
-    })
+    return () => document.removeEventListener('keydown', listener)
   })
 
-  createEffect(() => {
-    const el = props.listRef
-
-    if (!el) return
-
-    if (open()) {
-      el.style.overflow = 'hidden'
-    } else {
-      el.style.overflow = ''
-    }
-  })
+  createEffect(
+    () => ({ el: props.listRef, isOpen: open() }),
+    ({ el, isOpen }) => {
+      if (!el) return
+      el.style.overflow = isOpen ? 'hidden' : ''
+    },
+  )
 
   return (
     <Popover.Root open={open()} onOpenChange={setOpen} placement="top-end" gutter={15}>
       <Popover.Anchor>
-        <Popover.Trigger cmdk-raycast-subcommand-trigger="" aria-expanded={open()}>
+        <Popover.Trigger cmdk-raycast-subcommand-trigger="" aria-expanded={open() ? 'true' : 'false'}>
           Actions
           <kbd>⌘</kbd>
           <kbd>K</kbd>
