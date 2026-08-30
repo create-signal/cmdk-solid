@@ -1,6 +1,6 @@
 {
   "name": "cmdk-solid",
-  "version": "1.1.2",
+  "version": "1.2.0",
   "license": "MIT",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
@@ -26,15 +26,12 @@
     "dev": "tsup src --watch"
   },
   "peerDependencies": {
-    "solid-js": "^1.8.0"
+    "solid-js": "^1.8.0",
+    "@kobalte/core": ">=0.12.4 <1"
   },
-  "dependencies": {
-    "@kobalte/core": "^0.12.4",
-    "@kobalte/utils": "^0.9.0",
-    "@solid-primitives/deep": "^0.2.7",
-    "@solid-primitives/mutation-observer": "^1.1.17"
+  "devDependencies": {
+    "@kobalte/core": "^0.12.4"
   },
-  "devDependencies": {},
   "sideEffects": false,
   "repository": {
     "type": "git",
