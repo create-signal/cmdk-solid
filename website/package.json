@@ -24,7 +24,7 @@
     "vinxi": "^0.3.10"
   },
   "engines": {
-    "node": ">=18"
+    "node": ">=22"
   },
   "devDependencies": {
     "autoprefixer": "^10.4.18",
