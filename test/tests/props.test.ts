@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test'
+import { expect, test } from './fixtures'
 
 test.describe('props', async () => {
   test('results do not change when filtering is disabled', async ({ page }) => {

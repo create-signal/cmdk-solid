@@ -18,3 +18,6 @@ test-results/
 
 # tsup
 tsup.config.bundled_*.{m,c,}s
+# copied into the package at publish time
+cmdk-solid/README.md
+cmdk-solid/LICENSE

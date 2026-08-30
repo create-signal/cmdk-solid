@@ -24,7 +24,7 @@ const CI =
   process.env['CI'] === '"1"' ||
   process.env['GITHUB_ACTIONS'] === '"1"'
 
-export default defineConfig((config) => {
+export default defineConfig(async (config) => {
   const watching = !!config.watch
 
   const parsed_options = preset.parsePresetOptions(preset_options, watching)
@@ -35,7 +35,8 @@ export default defineConfig((config) => {
     console.log(`package.json: \n\n${JSON.stringify(package_fields, null, 2)}\n\n`)
 
     // will update ./package.json with the correct export fields
-    preset.writePackageJson(package_fields)
+    // awaited so tsup reads a complete package.json when resolving output extensions
+    await preset.writePackageJson(package_fields)
   }
 
   return preset.generateTsupOptions(parsed_options)

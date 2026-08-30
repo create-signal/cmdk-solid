@@ -6,7 +6,9 @@
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "files": [
-    "dist"
+    "dist",
+    "LICENSE",
+    "README.md"
   ],
   "exports": {
     "solid": "./dist/index.jsx",
@@ -20,8 +22,8 @@
     }
   },
   "scripts": {
-    "prepublishOnly": "cp ../README.md . && pnpm build",
-    "postpublish": "rm README.md",
+    "prepublishOnly": "cp ../README.md ../LICENSE . && pnpm build",
+    "postpublish": "rm README.md LICENSE",
     "build": "tsup src",
     "dev": "tsup src --watch"
   },
