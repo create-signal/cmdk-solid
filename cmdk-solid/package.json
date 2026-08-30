@@ -28,11 +28,11 @@
     "dev": "tsup src --watch"
   },
   "peerDependencies": {
-    "solid-js": "^1.8.0",
-    "@kobalte/core": ">=0.12.4 <1"
+    "@kobalte/core": ">=0.13.0 <1",
+    "solid-js": "^1.8.0"
   },
   "devDependencies": {
-    "@kobalte/core": "^0.12.4"
+    "@kobalte/core": "^0.13.13"
   },
   "sideEffects": false,
   "repository": {

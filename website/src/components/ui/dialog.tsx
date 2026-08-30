@@ -1,7 +1,7 @@
-import { Dialog as DialogPrimitive } from '@kobalte/core'
-import { DialogOverlayProps } from '@kobalte/core/dist/types/dialog'
+import { Dialog as DialogPrimitive, PolymorphicProps } from '@kobalte/core'
+import { DialogContentProps, DialogDescriptionProps, DialogOverlayProps, DialogTitleProps } from '@kobalte/core/dialog'
 import { X } from 'lucide-solid'
-import { Component, JSX, ParentComponent } from 'solid-js'
+import { Component, JSX, ParentComponent, ValidComponent } from 'solid-js'
 import { cn } from '~/lib/utils'
 
 const Dialog = DialogPrimitive.Root
@@ -12,7 +12,9 @@ const DialogPortal = DialogPrimitive.Portal
 
 const DialogClose = DialogPrimitive.CloseButton
 
-const DialogOverlay: ParentComponent<DialogOverlayProps> = (props) => (
+const DialogOverlay: <T extends ValidComponent = 'div'>(
+  props: PolymorphicProps<T, DialogOverlayProps<T>>,
+) => JSX.Element = (props) => (
   <DialogPrimitive.Overlay
     {...props}
     class={cn(
@@ -22,7 +24,9 @@ const DialogOverlay: ParentComponent<DialogOverlayProps> = (props) => (
   />
 )
 
-const DialogContent: ParentComponent<DialogPrimitive.DialogContentProps> = (props) => (
+const DialogContent: <T extends ValidComponent = 'div'>(
+  props: PolymorphicProps<T, DialogContentProps<T>>,
+) => JSX.Element = (props) => (
   <DialogPortal>
     <DialogOverlay />
     <DialogPrimitive.Content
@@ -49,23 +53,25 @@ const DialogFooter: ParentComponent<JSX.HTMLAttributes<HTMLDivElement>> = (props
   <div {...props} class={cn('flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2', props.class)} />
 )
 
-const DialogTitle: ParentComponent<DialogPrimitive.DialogTitleProps> = (props) => (
-  <DialogPrimitive.Title {...props} class={cn('text-lg font-semibold leading-none tracking-tight', props.class)} />
-)
+const DialogTitle: <T extends ValidComponent = 'h2'>(props: PolymorphicProps<T, DialogTitleProps<T>>) => JSX.Element = (
+  props,
+) => <DialogPrimitive.Title {...props} class={cn('text-lg font-semibold leading-none tracking-tight', props.class)} />
 
-const DialogDescription: ParentComponent<DialogPrimitive.DialogDescriptionProps> = (props) => (
+const DialogDescription: <T extends ValidComponent = 'p'>(
+  props: PolymorphicProps<T, DialogDescriptionProps<T>>,
+) => JSX.Element = (props) => (
   <DialogPrimitive.Description {...props} class={cn('text-sm text-muted-foreground', props.class)} {...props} />
 )
 
 export {
   Dialog,
-  DialogPortal,
-  DialogOverlay,
-  DialogTrigger,
   DialogClose,
   DialogContent,
-  DialogHeader,
-  DialogFooter,
-  DialogTitle,
   DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogOverlay,
+  DialogPortal,
+  DialogTitle,
+  DialogTrigger,
 }

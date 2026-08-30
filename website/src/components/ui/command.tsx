@@ -12,8 +12,8 @@ import {
 import { cn } from '~/lib/utils'
 import { Dialog, DialogContent } from '~/components/ui/dialog'
 import { Component, JSX, ParentComponent } from 'solid-js'
-import { DialogRootProps } from '@kobalte/core/dist/types/dialog'
 import { Search } from 'lucide-solid'
+import { DialogRootProps } from '@kobalte/core/dialog'
 
 const Command: ParentComponent<CommandRootProps> = (props) => (
   <CommandPrimitive

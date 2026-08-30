@@ -1,4 +1,4 @@
-import { Dialog as KobalteDialog } from '@kobalte/core'
+import { DialogRootProps, Dialog as KobalteDialog } from '@kobalte/core/dialog'
 import {
   Accessor,
   Component,
@@ -39,7 +39,7 @@ export type CommandSeparatorProps = DivProps & {
   /** Whether this separator should always be rendered. Useful if you disable automatic filtering. */
   alwaysRender?: boolean
 }
-export type CommandDialogProps = KobalteDialog.DialogRootProps &
+export type CommandDialogProps = DialogRootProps &
   CommandRootProps & {
     /** Provide a className to the Dialog overlay. */
     overlayClassName?: string
@@ -868,14 +868,14 @@ const Dialog: ParentComponent<CommandDialogProps> = (props) => {
     DIALOG_ROOT_KEYS,
   )
   return (
-    <KobalteDialog.Root {...dialogRootProps}>
+    <KobalteDialog {...dialogRootProps}>
       <KobalteDialog.Portal mount={props.container}>
         <KobalteDialog.Overlay cmdk-overlay="" class={props.overlayClassName} />
         <KobalteDialog.Content aria-label={props.label} cmdk-dialog="" class={props.contentClassName}>
           <Command {...etc} />
         </KobalteDialog.Content>
       </KobalteDialog.Portal>
-    </KobalteDialog.Root>
+    </KobalteDialog>
   )
 }
 
