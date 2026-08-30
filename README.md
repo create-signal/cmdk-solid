@@ -22,7 +22,7 @@ Demo and examples: [https://cmdk-solid.vercel.app/](https://cmdk-solid.vercel.ap
 ## Install
 
 ```bash
-pnpm install cmdk-solid @kobalte/core
+pnpm install cmdk-solid@next
 ```
 
 `@kobalte/core` is a peer dependency — ⌘K renders its dialog with the [Kobalte Dialog](https://kobalte.dev/docs/core/components/dialog).
